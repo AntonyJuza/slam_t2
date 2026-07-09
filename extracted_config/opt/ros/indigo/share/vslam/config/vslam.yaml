@@ -1,0 +1,19 @@
+mappingmode: 1  # 0 increatal mapping
+                # 1 new mapping, default
+savedatapath: /home/peanut/.ros/ # save pose_file and db_key path
+mutilSetMap: false
+reportError: true
+scan_match_minscore_travel: 60
+scan_match_minscore_init: 65
+map_match_minscore_travel: 60
+map_match_maxscore_travel: 100
+map_match_minscore_init: 65
+map_match_maxscore_init: 100
+match_search_line_init: 0.8
+match_search_angle_init: 35
+match_search_line_travel: 0.8
+match_search_angle_travel: 35
+Rb2c: [0.0, 0.0, 90.0]
+tb2c: [-0.181, 0.000, 0.000]
+search_radius_travel: 2.0
+enable_global_search_travel: true

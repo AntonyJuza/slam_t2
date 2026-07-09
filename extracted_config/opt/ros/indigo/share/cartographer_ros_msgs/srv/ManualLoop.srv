@@ -1,0 +1,7 @@
+
+string option   #record_position  manual_loop
+int8 trajectoryid
+bool signal
+---
+string msg
+int8 code

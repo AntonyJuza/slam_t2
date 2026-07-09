@@ -1,0 +1,8 @@
+string option
+int8 floor
+string md5
+char[] data
+---
+string msg
+uint32 result
+char[] data

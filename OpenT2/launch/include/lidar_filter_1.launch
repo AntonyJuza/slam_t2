@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node name="lidar_filter" pkg="lidar_filter" type="lidar_filter" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/lidar_filter_params.yaml" command="load"/>
+        <remap from="scan" to="scan_orig"/>
+        <remap from="scan_filtered" to="scan"/>
+    </node>
+
+    <node name="lidar_filter_for_planner" pkg="lidar_filter" type="lidar_filter" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/lidar_filter_for_planner_params.yaml" command="load"/>
+        <remap from="scan" to="scan_orig"/>
+        <remap from="scan_filtered" to="planner_scan"/>
+    </node>
+
+</launch>

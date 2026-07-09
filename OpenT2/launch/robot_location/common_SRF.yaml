@@ -1,0 +1,8 @@
+laser_scan_topic: "/scan_orig"
+laser_odom_topic: "/laser_odom"
+
+laser_decimation: 1
+laser_min_range: -1.0
+laser_max_range: -1.0
+operation_mode: "HYBRID"
+

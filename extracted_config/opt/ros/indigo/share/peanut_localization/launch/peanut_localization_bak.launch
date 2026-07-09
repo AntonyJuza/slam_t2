@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+	<!-- initial pose topics -->
+    <arg name="pose_with_covariance_stamped_topic" default="/initialpose" />
+	<!-- frame ids -->
+    <arg name="map_frame_id" default="map" />
+	<arg name="odom_frame_id" default="odom" />
+	<arg name="base_link_frame_id" default="base_link" />
+	<arg name="sensor_frame_id" default="laser_link" />
+	<arg name="publish_tf_from_peanut_localization" default="true" />
+	<!-- main configurations -->
+    <arg name="nodes_respawn" default="false" />
+    <arg name="peanut_localization_node_name" default="peanut_localization_node" />
+    <arg name="yaml_configuration_filters_filename" default="$(find peanut_localization)/yaml/configs/filters/filters_2d.yaml" />
+    <arg name="yaml_configuration_pose_estimation_filename" default="$(find peanut_localization)/yaml/configs/pose_estimation/initial_pose_estimation_large_map_2d.yaml" />
+    <arg name="yaml_configuration_tracking_filename" default="$(find peanut_localization)/yaml/configs/pose_tracking/cluttered_environments_dynamic_fast_2d.yaml" />
+    <arg name="yaml_configuration_recovery_filename" default="$(find peanut_localization)/yaml/configs/pose_recovery/recovery_2d.yaml" />
+	<!-- reference map data -->
+    <arg name="reference_costmap_topic" default="/map" />
+	<!-- ==================================================== localization system ============================================= -->
+    <node pkg="peanut_localization" type="peanut_localization_node" name="$(arg peanut_localization_node_name)" respawn="$(arg nodes_respawn)" clear_params="true" output="screen" >
+		<param name="publish_tf_map_odom" type="bool" value="true" />
+		<param name="out_percentage_thresh" type="double" value="0.4" />
+		<param name="scan_topic" type="str" value="scan" />
+		<param name="use_map_topic" type="bool" value="true" />
+		<param name="d_thresh" type="double" value="0.05" />
+		<param name="a_thresh" type="double" value="0.05" />
+		<param name="min_scan_cloud_range" type="double" value="0.2" />
+		<param name="transform_tolerance" type="double" value="0.05" />
+		<param name="test_bag" type="bool" value="false" />
+
+		<param name="frame_ids/map_frame_id" type="str" value="$(arg map_frame_id)" />
+		<param name="frame_ids/odom_frame_id" type="str" value="$(arg odom_frame_id)" />
+		<param name="frame_ids/base_link_frame_id" type="str" value="$(arg base_link_frame_id)" />
+		<param name="frame_ids/sensor_frame_id" type="str" value="$(arg sensor_frame_id)" />
+		<param name="general_configurations/publish_tf_map_odom" type="bool" value="$(arg publish_tf_from_peanut_localization)" /> 
+		<param name="subscribe_topic_names/pose_with_covariance_stamped_topic" type="str" value="$(arg pose_with_covariance_stamped_topic)" />
+		<param name="subscribe_topic_names/reference_costmap_topic" type="str" value="$(arg reference_costmap_topic)" />        
+        <rosparam command="load" file="$(arg yaml_configuration_filters_filename)" subst_value="true" />
+		<rosparam command="load" file="$(arg yaml_configuration_pose_estimation_filename)" subst_value="true" />
+		<rosparam command="load" file="$(arg yaml_configuration_recovery_filename)" subst_value="true" />
+		<rosparam command="load" file="$(arg yaml_configuration_tracking_filename)" subst_value="true" />
+	</node>	
+</launch>
+ 

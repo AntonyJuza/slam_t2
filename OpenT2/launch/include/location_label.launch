@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!--<arg name="model" default="$(find chassis)/urdf/robot.urdf"/>
+    <param name="robot_description" textfile="$(arg model)" />
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+        <param name="publish_frequency" type="double" value="50.0"/>
+    </node>
+    -->
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+  <node pkg="location_label" name="robot_pose_location_label_node" type="robot_pose_location_label_node" output="screen" >
+    <!-- <rosparam file="$(find region_cover_start)/param/costmap_common_params.yaml" command="load" ns="local_costmap" /> -->
+
+  </node>
+</launch>

@@ -1,0 +1,8 @@
+ip_address: 192.168.64.100
+frame_id: laser_link
+ob1_angle_min: -1.67
+ob1_angle_max: -0.84
+ob2_angle_min: 0.84
+ob2_angle_max: 1.67
+angle_max: 1.9
+angle_min: -1.9

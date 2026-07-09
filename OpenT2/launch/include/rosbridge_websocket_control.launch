@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="OUTPUT_METHOD" default="screen"/>
+  <arg name="RESPAWN" default="false"/>
+  <arg name="ROBOT_TYPE" default="peanut"/>
+
+  <arg name="port" default="9091" />
+  <arg name="address" default="" />
+  <arg name="ssl" default="false" />
+  <arg name="certfile" default=""/>
+  <arg name="keyfile" default="" />
+
+  <arg name="retry_startup_delay" default="5" />
+
+  <arg name="fragment_timeout" default="600" />
+  <arg name="delay_between_messages" default="0" />
+  <arg name="max_message_size" default="None" />
+
+  <arg name="authenticate" default="false" />
+
+  <group if="$(arg ssl)" ns="control">
+    <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+      <param name="certfile" value="$(arg certfile)" />
+      <param name="keyfile" value="$(arg keyfile)" />
+      <param name="authenticate" value="$(arg authenticate)" />
+      <param name="port" value="$(arg port)"/>
+      <param name="address" value="$(arg address)"/>
+      <param name="retry_startup_delay" value="$(arg retry_startup_delay)"/>
+      <param name="fragment_timeout" value="$(arg fragment_timeout)"/>
+      <param name="delay_between_messages" value="$(arg delay_between_messages)"/>
+      <param name="max_message_size" value="$(arg max_message_size)"/>
+    </node>
+  </group>
+  <group unless="$(arg ssl)" ns="control">
+    <node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+      <param name="authenticate" value="$(arg authenticate)" />
+      <param name="port" value="$(arg port)"/>
+      <param name="address" value="$(arg address)"/>
+      <param name="retry_startup_delay" value="$(arg retry_startup_delay)"/>
+      <param name="fragment_timeout" value="$(arg fragment_timeout)"/>
+      <param name="delay_between_messages" value="$(arg delay_between_messages)"/>
+      <param name="max_message_size" value="$(arg max_message_size)"/>
+    </node>
+  </group>
+
+  <group ns="control">
+  <node name="rosapi" pkg="rosapi" type="rosapi_node" />
+  </group>
+</launch>

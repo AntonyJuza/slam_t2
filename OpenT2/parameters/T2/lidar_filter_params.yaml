@@ -1,0 +1,10 @@
+global_filter: true
+enabled: true
+search_dist: 0.4
+search_th: 0.1
+search_intensity: 180.0
+en_x: 0.0
+en_y: 0.0
+en_r: 0.0
+dist_thre: 0.03
+th_thre: 0.45

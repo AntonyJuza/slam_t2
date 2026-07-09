@@ -1,0 +1,3 @@
+<launch>
+     <node pkg="suspend_obs" type="suspend_obs_node" name="suspend_obs_node" output="screen"/>
+</launch>

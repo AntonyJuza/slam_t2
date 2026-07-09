@@ -1,0 +1,3 @@
+debug_log: false
+move_base: {side_drive_status: 2}
+navigation: {narrow_passage: 2}

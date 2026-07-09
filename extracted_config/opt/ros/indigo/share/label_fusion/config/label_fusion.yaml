@@ -1,0 +1,17 @@
+%YAML:1.0
+
+robot_label_mode: 1 # 1 ��ģʽ���Ա�ǩ�������ֱ�׼��ǩ��Ǳ�׼��ǩ
+                    # 0 ��ģʽ����ID��Χ���ֱ�׼��ǩ��Ǳ�׼��ǩ
+nonstandard_label_points: "" #�Ǳ�׼��ǩ����,robot_label_mode 1 ʱʹ��
+nonstandard_label_limit_number: 0  #�Ǳ�׼��ǩID��Χ,robot_label_mode 0 ʱʹ��                          
+nonstandard_label_scale: 1.34 # �Ǳ�׼��ǩ���ų߶�
+
+initial_mode: 1 # 2 double label or one special label(28662) initial location
+                # 1 multi detect can initial  
+
+label_save_path: "/home/peanut/label/"
+label_rviz: 0   # 0 doesn't publish rvizVisualization msg of label
+                # 1 publish rvizVisualization msg of label
+detection_window_size: 15
+specialLabelID: 28662
+label_delay_time: 70 #label_camera process image cost time ms

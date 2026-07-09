@@ -1,0 +1,97 @@
+TebLocalPlannerROS:
+
+ odom_topic: odom
+
+ # Trajectory
+
+ teb_autosize: True
+ dt_ref: 0.1
+ dt_hysteresis_scale: 0.04
+ controller_frequency: 15.0
+ global_plan_overwrite_orientation: True
+ global_plan_viapoint_sep: -0.1
+ max_global_plan_lookahead_dist: 2.0
+ max_global_plan_sim_time: 3.0
+ force_reinit_new_goal_dist: 0.4
+ force_reinit_duration: 10.0
+ feasibility_check_no_poses: 5
+ shrink_horizon_backup: False
+ allow_init_with_backwards_motion: False
+ path_follow_threshold: -1.0
+ #publish_feedback: True
+
+ # Robot
+
+ max_vel_x: 1.0
+ low_speed_vel_x: 0.5
+ elev_mode_vel_x: 0.5
+ max_vel_x_backwards: 0.0
+ max_vel_theta: 1.0
+ low_speed_vel_theta: 0.8
+ acc_lim_x: 0.3
+ deceleration_lim_x: 0.6
+ elev_mode_acc_x: 0.2
+ acc_lim_theta: 1.0
+ deceleration_lim_theta: 1.0
+ use_auto_velocity_level: True
+ auto_velocity_obstacle_dist: 0.05
+ auto_velocity_obstacle_orien: 1.05
+ auto_velocity_min_vel_x: 0.5
+ force_velocity_smooth: True
+ control_delay_duration: 0.1
+ control_time_lapse: 0.1
+ useSpeedSmooth: True
+ linear_jerk_limit: 0.0054
+
+ footprint_model:
+   type: "multi_circles"
+   circles_param: [[-0.038, 0.0, 0.257], [0.047, 0.0, 0.241], [0.2, 0.15, 0.1], [0.2, -0.15, 0.1]]
+
+ # GoalTolerance
+
+ xy_goal_tolerance: 0.1
+ yaw_goal_tolerance: 0.2
+ allow_goal_orientation_reverse: False
+
+ # Obstacles
+
+ min_obstacle_dist: 0.035 # This value must also include our robot radius, since footprint_model is set to "point".
+ inflation_dist: 0.1
+ include_costmap_obstacles: True
+ costmap_obstacles_behind_robot_dist: 0.5
+ costmap_obstacles_beside_robot_dist: 1.0
+ obstacle_poses_affected: 30
+ obstacle_association_force_inclusion_dist: 0.02
+ obstacle_association_cutoff_dist: 1.0
+ safe_stop_dist: 0.5
+ safe_stop_dist_no_avoidance: 0.1
+ elev_obstacle_escape: true #may crash to elevator door, do not enable it in heavy robot
+
+ # Optimization
+
+ no_inner_iterations: 2
+ no_outer_iterations: 4
+ outer_iterations_autoadjust: True
+ optimization_activate: True
+ optimization_verbose: False
+ penalty_epsilon: 0.0
+ penalty_epsilon_vel_x: 0.1
+ weight_max_vel_x: 20
+ weight_max_vel_theta: 10
+ weight_acc_lim_x: 5
+ weight_acc_lim_theta: 5
+ weight_kinematics_nh: 1000
+ weight_kinematics_forward_drive: 1000
+ weight_kinematics_turning_radius: 1
+ weight_optimaltime: 10
+ weight_obstacle: 1000
+ weight_inflation: 5
+ weight_viapoint: 30
+ weight_adapt_factor: 2
+ enable_turn_key_point: True
+ #weight_dynamic_obstacle: 10 # not in use yet
+
+ # Homotopy Class Planner
+
+ enable_homotopy_class_planning: False
+ open_check_back_off: False

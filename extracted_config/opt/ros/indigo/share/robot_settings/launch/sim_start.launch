@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <include file="$(find robot_settings)/launch/include/stage.launch"/>
+    <include file="$(find robot_settings)/launch/include/map_server.launch"/>
+    <include file="$(find robot_settings)/launch/include/virtual_wall_server.launch"/>
+    <!-- <include file="$(find robot_settings)/launch/include/switch_map_virtual_wall_server.launch"/> -->
+   <!-- <include file="$(find robot_settings)/launch/include/init_location.launch"/>-->
+    <include file="$(find robot_settings)/launch/include/amcl.launch"/>
+    <include file="$(find robot_settings)/launch/include/move_base_teb_sim.launch"/>
+    <!-- <include file="$(find robot_settings)/launch/include/ui_interactive.launch"/> -->
+    <include file="$(find robot_settings)/launch/include/rviz.launch"/>
+
+</launch>

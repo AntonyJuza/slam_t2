@@ -1,0 +1,40 @@
+
+<launch>
+   <!--当回放bag数据集设置为true,使用仿真时间，设置为false，则系统使用walltime-->
+  <param name="/use_sim_time" value="false" />
+  <arg name="GmappingMapTopic" default="/gmapping_map"/>
+  <arg name="OUTPUT_METHOD" default="screen"/>
+  <arg name="RESPAWN" default="false"/>
+  <arg name="ROBOT_TYPE" default="W3"/>
+  <!--<param name="robot_description"
+    textfile="$(find cartographer_ros)/urdf/keenon.urdf" />-->
+
+<!--  <node name="robot_state_publisher" pkg="robot_state_publisher"-->
+<!--    type="robot_state_publisher" />-->
+
+  <node name="cartographer_node" pkg="cartographer_ros"
+      type="cartographer_node" args="
+          -configuration_directory $(find cartographer_ros)/configuration_files
+          -configuration_basename keenon_$(arg ROBOT_TYPE).lua"
+      respawn="$(arg RESPAWN)"
+      output="$(arg OUTPUT_METHOD)"
+      >
+    <!--remap from="scan" to="scan_orig" /-->
+    <!--remap from="odom" to="odom_combined" /-->
+    
+  </node>
+
+  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
+      type="cartographer_occupancy_grid_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)"
+      args="-resolution 0.05">
+      <remap from="/map" to="$(arg GmappingMapTopic)"/>
+  </node>
+  <!--node name="rviz" pkg="rviz" type="rviz" required="true"
+      args="-d $(find cartographer_ros)/configuration_files/demo_2d.rviz" /-->
+ 
+<!--      <remap from="scan" to="scan0" />-->
+ 
+
+<!--  <node pkg="rosbag" type="record" name="rosbag_record" args="record -o qqqqqqq /scan /scan0 /tf"/>-->
+
+</launch>

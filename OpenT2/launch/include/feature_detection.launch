@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="feature_detection" type="feature_detection_node"  name="feature_detection_node" output="screen">
+        <param name="clustered_dots" value="5"/>
+    	<param name="model_path" value="$(find robot_settings)/cfg/model/model.txt"/>
+    </node>
+</launch>

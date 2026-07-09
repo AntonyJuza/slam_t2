@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+	<!-- main configurations -->
+    <arg name="peanut_localization_node_name" default="peanut_localization_node" />
+
+    <node pkg="peanut_localization" type="peanut_localization_node" name="$(arg peanut_localization_node_name)" respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)" >
+		<rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/peanut_localization_params.yaml" command="load"/>
+		<rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/filters_2d.yaml" command="load"/>
+		<rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/initial_pose_estimation_large_map_2d.yaml" command="load"/>
+		<rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/cluttered_environments_dynamic_fast_2d.yaml" command="load"/>
+		<rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/recovery_2d.yaml" command="load"/>
+	</node>	
+</launch>
+ 

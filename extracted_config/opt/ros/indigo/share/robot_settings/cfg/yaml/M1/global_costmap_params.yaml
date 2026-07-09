@@ -1,0 +1,33 @@
+global_costmap:
+  global_frame: map
+  robot_base_frame: base_link
+  update_frequency: 5.0
+  publish_frequency: 5.0
+  footprint_padding: 0.03
+  plugins:
+    - {name: static_layer, type: "costmap_2d::StaticLayer"}
+    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    - {name: virtual_wall, type: "costmap_2d::StaticLayer"}
+    
+  static_layer:
+    enabled:              false
+    map_topic:            /map
+
+  obstacle_layer:
+    observation_sources: scan bump schedule_obstacle_position
+    obstacle_glow: true
+    glow_depth: 3
+    map_all_clear: false
+    track_unknown_space: true
+    use_maximum: false
+
+  inflation_layer:
+    cost_scaling_factor:  5.0
+    inflation_radius:     1.5
+
+  virtual_wall:
+    enabled: false
+    map_topic: /virtual_wall
+    virtual_wall_mode: true
+    individual_size: true

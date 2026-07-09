@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="T2"/>
+
+  <node name="sdkeli_front" pkg="sdkeli_ls_udp" type="sdkeli_ls1207de" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+      <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/sdkeli_params.yaml" command="load"/>
+      <remap from="scan" to="scan_front_orig"/>
+      <param name="frame_id" type="str" value="laser_front_link" />
+      <param name="hostname" type="string" value="192.168.64.100" />
+  </node>
+
+  <node name="sdkeli_back" pkg="sdkeli_ls_udp" type="sdkeli_ls1207de" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+      <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/sdkeli_params.yaml" command="load"/>
+      <remap from="scan" to="scan_back_orig"/>
+      <param name="frame_id" type="str" value="laser_back_link" />
+      <param name="hostname" type="string" value="192.168.64.101" />
+      <remap from="/sensor_module/driver/lidar/front/version" to="/sensor_module/driver/lidar/back/version" />
+  </node>
+</launch>

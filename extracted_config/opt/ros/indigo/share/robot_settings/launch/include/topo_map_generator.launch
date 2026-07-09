@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="log"/>
+    <arg name="RESPAWN" default="true"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <node pkg="topo_map_generator" type="topo_map_generator_node" name="topo_map_generator_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)"/>
+    <param name="crossing_optimization" type="double" value="0.6"/>
+    <param name="endSegment_optimization" type="double" value="0.6"/>
+    <param name="inflation" type="double" value="0.3"/>
+    <param name="segment_length" type="double" value="1.2"/>
+    <param name="resolution" type="double" value="0.05"/>
+    <param name="min_pass_space" type="double" value="0.65"/>
+    <param name="region_radius" type="double" value="1.5"/>
+    <param name="origin_x" type="int" value="-100"/>
+    <param name="origin_y" type="int" value="-100"/>
+    <param name="map_height" type="int" value="4000"/>
+    <param name="map_height" type="int" value="4000"/>
+    <param name="start_debug" type="int" value="1"/>
+    <param name="optimize" type="int" value="1"/>
+    <param name="optimize_distance_" type="double" value="1.5"/>
+    <param name="debug_path" type="str" value="/voronoi_data/"/>
+    <!--param name="debug_path" type="str" value="/home/bs/work/code/demo/VoronoiGenerator/data/"/-->
+</launch>

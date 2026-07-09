@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="BAG_DIR" default="$(env HOME)/.ros/bag"/>
+    <arg name="BAG_NAME" default="GmappingRecord"/>
+    <arg name="MapName" default="$(arg BAG_NAME)"/>
+<!--  default map path: $HOME/.ros/ -->
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <arg name="GmappingMapTopic" default="gmapping_map"/>
+
+    <node pkg="gmapping" type="slam_gmapping_replay" name="slam_gmapping_replay" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" args="
+	--scan_topic /scan
+	--bag_filename $(arg BAG_DIR)/$(arg BAG_NAME).bag
+	--max_duration_buffer 99999
+	--on_done 'rosrun map_server map_saver -f $(arg MapName) map\:\=$(arg GmappingMapTopic)'
+	">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/gmapping_replay_params.yaml" command="load" />
+    </node>
+
+</launch>

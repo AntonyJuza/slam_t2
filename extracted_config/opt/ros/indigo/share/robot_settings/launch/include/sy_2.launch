@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+
+<arg name="OUTPUT_METHOD" default="screen"/>
+<arg name="RESPAWN" default="false"/>
+<arg name="ROBOT_TYPE" default="peanut"/>
+    <node name="sy_sdk_node" pkg="sy_sdk" type="sy_sdk_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/sy_2.yaml" command="load" />
+    <node name="cloud_handle_node" pkg="sy_sdk" type="cloud_handle_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" />    
+    <node name="mx_send_depth" pkg="show_points" type="send_depth_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/mx_2.yaml" command="load" />
+    <node name="get_version" pkg="show_points" type="get_mx_version.sh" output="$(arg OUTPUT_METHOD)"  launch-prefix="bash -c 'sleep 30; $0 $@' " />
+</launch>

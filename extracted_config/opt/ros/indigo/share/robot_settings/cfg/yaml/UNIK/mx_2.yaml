@@ -1,0 +1,4 @@
+mask_min: -0.1
+mask_max: 0.23
+mask_height: 1
+camera_num: 1

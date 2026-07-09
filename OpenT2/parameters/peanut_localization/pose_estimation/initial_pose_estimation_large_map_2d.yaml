@@ -1,0 +1,17 @@
+initial_pose_estimators_matchers:
+    point_matchers:
+        iterative_closest_point:
+            convergence_time_limit_seconds: 2.0
+            max_correspondence_distance: 3.5 #8.0 #5.0
+            transformation_epsilon: 1e-3
+            euclidean_fitness_epsilon: 1e-3
+            max_number_of_registration_iterations: 200
+            max_number_of_ransac_iterations: 0
+            ransac_outlier_rejection_threshold: 0.2
+            match_only_keypoints: false
+            display_cloud_aligment: false
+            maximum_number_of_displayed_correspondences: 0
+            rotation_epsilon: 0.002
+            correspondence_randomness: 50
+            maximum_optimizer_iterations: 10
+            use_reciprocal_correspondences: true #true

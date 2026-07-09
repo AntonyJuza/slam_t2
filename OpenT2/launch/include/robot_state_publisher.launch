@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <param name="robot_description" textfile="$(find robot_settings)/model/$(arg ROBOT_TYPE).urdf" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="publish_frequency" type="double" value="50.0"/>
+    </node>
+</launch>

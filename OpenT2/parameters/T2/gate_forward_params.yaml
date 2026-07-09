@@ -1,0 +1,3 @@
+serial_port: /dev/ttyUSBGate
+baudrate: 115200
+default_ID: 123410

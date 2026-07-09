@@ -1,0 +1,9 @@
+<launch>
+  <arg name="OUTPUT_METHOD" default="screen"/>
+  <arg name="RESPAWN" default="false"/>
+  <arg name="ROBOT_TYPE" default="peanut"/>
+  <arg name="yaml_configuration_filename" default="$(find vslam)/config/vslam.yaml" />
+  <node pkg="vslam" type="vslam_node" name="ros_vslam" output="$(arg OUTPUT_METHOD)" respawn="$(arg RESPAWN)">
+      <rosparam file="$(arg yaml_configuration_filename)"  command="load"/>
+  </node>
+</launch>

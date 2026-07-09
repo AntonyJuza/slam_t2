@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <arg name="ROBOT_GROUP" default="restaurant"/>
+    <arg name="yaml_configuration_filters_filename" default="$(find peanut_localization)/yaml/configs/filters/filters_2d.yaml" />
+    <arg name="yaml_configuration_pose_estimation_filename" default="$(find peanut_localization)/yaml/configs/pose_estimation/initial_pose_estimation_large_map_2d.yaml" />
+    <arg name="yaml_configuration_tracking_filename" default="$(find peanut_localization)/yaml/configs/pose_tracking/cluttered_environments_dynamic_fast_2d.yaml" />
+    <arg name="yaml_configuration_recovery_filename" default="$(find peanut_localization)/yaml/configs/pose_recovery/recovery_2d.yaml" />
+    <arg name="yaml_configuration_location_filename" default="$(find peanut_localization)/yaml/configs/location_common/common.yaml" />
+    <arg name="yaml_create_local_map_filename" default="$(find peanut_localization)/yaml/configs/create_local_map/creat_local_map.yaml" />
+
+	<!-- main configurations -->
+    <arg name="peanut_localization_node_name" default="peanut_localization_node" />
+
+    <node pkg="peanut_localization" type="peanut_localization_node" name="$(arg peanut_localization_node_name)" respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)" >
+		<rosparam file="$(arg yaml_configuration_filters_filename)"  command="load"/>
+		<rosparam file="$(arg yaml_configuration_pose_estimation_filename)" command="load"/>
+		<rosparam file="$(arg yaml_configuration_recovery_filename)"  command="load"/>
+		<rosparam file="$(arg yaml_configuration_tracking_filename)" command="load"/>
+		<rosparam file="$(arg yaml_configuration_location_filename)" command="load"/>
+		<rosparam file="$(arg yaml_create_local_map_filename)" command="load"/>
+        <param name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)" />
+        <param name="ROBOT_GROUP" value="$(arg ROBOT_GROUP)" />
+	</node>	
+</launch>
+ 
+

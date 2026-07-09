@@ -1,0 +1,20 @@
+obstacle_range: 2.0
+raytrace_range: 5.0
+#footprint: [[0,0.25],[0.125,0.2166], [0.2166, 0.125], [0.25,0],[0.2166, -0.125], [0.125, -0.2166], [0, -0.25], [-0.125, -0.2166], [-0.2166, -0.125], [-0.25, 0], [-0.2166, 0.125], [-0.125, 0.2166]]
+footprint: [[0.2400, 0], [0.2318, 0.0621], [0.2078, 0.1200], [0.1697, 0.1697], [0.1200, 0.2078], [0.0621, 0.2318], [0, 0.2400], [-0.0621, 0.2318], [-0.1200, 0.2078], [-0.1697, 0.1697], [-0.2078, 0.1200], [-0.2318, 0.0621], [-0.2400, 0], [-0.2318, -0.0621], [-0.2078, -0.1200], [-0.1697, -0.1697], [-0.1200, -0.2078], [-0.0621, -0.2318], [0, -0.2400], [0.0621, -0.2318], [0.1200, -0.2078], [0.1697, -0.1697], [0.2078, -0.1200], [0.2318, -0.0621], [0.2400, 0]] 
+footprint_padding: 0.0
+scan: {
+sensor_frame: laser_link,
+observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: LaserScan, topic: /scan, expected_update_rate: 0.3}
+camera: {
+sensor_frame: camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true}
+bump: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 1.0, min_obstacle_height: 0.1, data_type: PointCloud2, topic: /bump, expected_update_rate: 1.0, marking_allow_timeout: true}
+gate: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: PointCloud2, topic: /gate_cloud}
+schedule_obstacle_position: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 0.1, min_obstacle_height: -0.1, obstacle_range: 2.0, data_type: PointCloud2, topic: /schedule_obstacle_position, expected_update_rate: 0.3, marking_allow_timeout: true}

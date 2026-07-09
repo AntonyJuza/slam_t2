@@ -1,0 +1,17 @@
+#common
+footprint_type: circular
+footprint_radius: 0.25
+scan_topic: scan
+virtualwall_topic: virtual_wall
+base_frame: base_link
+odom_frame: odom
+map_frame: map
+controller_frequency: 20.0
+
+#charge_task
+charge_dist_1: 0.6
+charge_dist_2: 0.41
+charge_dist_3: 0.16
+charge_score: 0.035
+charge_scan_back: false
+charge_pile: default

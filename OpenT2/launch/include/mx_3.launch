@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <node name="mx_receive_depth" pkg="show_points" type="receive_depth_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" />
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/mx_2.yaml" command="load" />
+    <node name="mx_send_depth" pkg="show_points" type="send_depth_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" />
+    <include file="$(find robot_settings)/launch/include/astra_1.launch"/>
+
+</launch>

@@ -1,0 +1,8 @@
+prefix=/opt/ros/indigo/
+
+Name: cartographer_ros
+Description: Description of cartographer_ros
+Version: 1.0.0
+Cflags: -I/opt/ros/indigo//include -I/usr/include/pcl-1.7 -I/usr/include/eigen3 -I/usr/include
+Libs: -L/opt/ros/indigo//lib -lcartographer_ros -l:/usr/lib/libpcl_common.so -l:/usr/lib/x86_64-linux-gnu/libboost_filesystem.so -l:/usr/lib/x86_64-linux-gnu/libboost_thread.so -l:/usr/lib/x86_64-linux-gnu/libboost_date_time.so -l:/usr/lib/x86_64-linux-gnu/libboost_serialization.so -l:/usr/lib/x86_64-linux-gnu/libboost_chrono.so -l:/usr/lib/x86_64-linux-gnu/libboost_atomic.so -l:/usr/lib/x86_64-linux-gnu/libboost_system.so -l:/usr/lib/x86_64-linux-gnu/libboost_iostreams.so -l:/usr/lib/x86_64-linux-gnu/libboost_regex.so
+Requires: cartographer_ros_msgs eigen_conversions geometry_msgs message_runtime nav_msgs pcl_conversions rosbag roscpp roslib sensor_msgs std_msgs tf2 tf2_eigen tf2_ros tf urdf visualization_msgs keenon_label_msgs keenon_database_msgs keenon_nav_msgs keenon_vslam_msgs keenon_event_tracking urdf tf

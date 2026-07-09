@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <param name="use_sim_time" value="true" />
+    <arg name="stage_world_path" default="$(find robot_settings)/sim/world/keenon.world"/>
+
+    <node name="stage" pkg="stage_ros" type="stageros" args="-g $(arg stage_world_path)" ns="/" output="log">
+        <remap from="base_scan" to="scan"/>
+    </node>
+
+</launch>

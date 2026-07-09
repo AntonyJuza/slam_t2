@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+  <!-- <param name="robot_description" command="$(find xacro)/xacro.py '$(find sdkeli_ls_udp)/urdf/sdkeli_ls1207de.urdf.xacro'" /> -->
+<!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+-->
+  <!-- <node name="sdkeli_ls1207de" pkg="sdkeli_ls_udp" type="sdkeli_ls1207de" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+      <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/sdkeli_params.yaml" command="load"/>
+      <remap from="scan" to="scan_orig" />
+  </node> -->
+
+  <node name="LD06" pkg="ldlidar" type="ldlidar" output="screen" >
+      <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/sdkld_params.yaml" command="load"/>
+  </node>
+</launch>

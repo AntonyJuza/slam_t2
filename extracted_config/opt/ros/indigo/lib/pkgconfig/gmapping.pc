@@ -1,0 +1,8 @@
+prefix=/opt/ros/indigo
+
+Name: gmapping
+Description: Description of gmapping
+Version: 2.0.0
+Cflags: 
+Libs: -L/opt/ros/indigo/lib 
+Requires: 

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- <param name="use_sim_time" value="false" /> -->
+  <arg name="OUTPUT_METHOD" default="screen"/>
+  <arg name="RESPAWN" default="false"/>
+  <arg name="ROBOT_TYPE" default="peanut"/>
+  <arg name="yaml_configuration_filename" default="$(find location_fusion)/yaml/location_fusion.yaml" />
+
+  <node pkg="location_fusion" type="location_fusion_node" name="location_fusion" respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)" >
+  		<rosparam file="$(arg yaml_configuration_filename)"  command="load"/>
+
+  </node>
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find location_fusion)/config/fusion.rviz" required="true"/>  -->
+
+</launch>

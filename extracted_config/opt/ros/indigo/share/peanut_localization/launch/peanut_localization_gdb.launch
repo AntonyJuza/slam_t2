@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <arg name="yaml_configuration_filters_filename" default="$(find peanut_localization)/yaml/configs/filters/filters_2d.yaml" />
+    <arg name="yaml_configuration_pose_estimation_filename" default="$(find peanut_localization)/yaml/configs/pose_estimation/initial_pose_estimation_large_map_2d.yaml" />
+    <arg name="yaml_configuration_tracking_filename" default="$(find peanut_localization)/yaml/configs/pose_tracking/cluttered_environments_dynamic_fast_2d.yaml" />
+    <arg name="yaml_configuration_recovery_filename" default="$(find peanut_localization)/yaml/configs/pose_recovery/recovery_2d.yaml" />
+    <arg name="yaml_configuration_location_filename" default="$(find peanut_localization)/yaml/configs/location_common/common.yaml" />
+    <arg name="yaml_create_local_map_filename" default="$(find peanut_localization)/yaml/configs/create_local_map/creat_local_map.yaml" />
+	<!-- main configurations -->
+    <arg name="peanut_localization_node_name" default="peanut_localization_node" />
+
+    <node launch-prefix="gdb -ex run --args" pkg="peanut_localization" type="peanut_localization_node" name="$(arg peanut_localization_node_name)" respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)" >
+		<rosparam file="$(arg yaml_configuration_filters_filename)"  command="load"/>
+		<rosparam file="$(arg yaml_configuration_pose_estimation_filename)" command="load"/>
+		<rosparam file="$(arg yaml_configuration_recovery_filename)"  command="load"/>
+		<rosparam file="$(arg yaml_configuration_tracking_filename)" command="load"/>
+		<rosparam file="$(arg yaml_configuration_location_filename)" command="load"/>
+		<rosparam file="$(arg yaml_create_local_map_filename)" command="load"/>
+    </node>	
+  	<!-- ================================================== location lost detection ============================================= -->
+    
+<!--arg name="location_lost_detection_node_name" default="location_lost_detection_node"/>
+    <node pkg="peanut_localization" type="location_lost_detection_node" name="$(arg location_lost_detection_node_name)" respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)">
+	 <param name="gaussian_score_limit" type="double" value="0.6" />
+    <param name="bad_point_score_limit" type="double" value="0.08" />
+    <param name="best_bad_point_score_limit" type="double" value="0.09" />
+    <param name="location_lost_score_limit" type="double" value="0.3" />
+    <param name="detection_interval_limit" type="int" value="1" />
+    <param name="wait_for_interval_limit" type="int" value="0" />  
+   
+    <param name="world_frame_id" type="str" value="map" />
+    <param name="laser_frame_id" type="str" value="laser_link" />
+    <param name="base_frame_id" type="str" value="base_link" />
+  </node-->	
+</launch>
+ 

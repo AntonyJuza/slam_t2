@@ -1,0 +1,14 @@
+global_filter: true
+enabled: true
+search_dist: 10.0
+search_th: 0.1
+search_intensity: 180.0
+en_x: 0.0
+en_y: 0.0
+en_r: 0.0
+dist_thre: 0.03
+th_thre: 1.5
+min_angle: 3.75
+max_angle: 176.25
+neighbors: 1
+window: 1

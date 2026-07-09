@@ -1,0 +1,19 @@
+
+
+SET(PROTOBUF_INCLUDE_DIR
+${KEENON_CROSS_DEPS_DIRS}/local/include
+)
+
+SET(PROTOBUF_LIBRARY_DIRS
+${KEENON_CROSS_DEPS_DIRS}/local/lib
+)
+
+SET(PROTOBUF_LIBRARY
+libprotobuf.so
+)
+
+SET(PROTOBUF_PROTOC_EXECUTABLE
+    /usr/local/bin/protoc
+)
+
+link_directories(${PROTOBUF_LIBRARY_DIRS})

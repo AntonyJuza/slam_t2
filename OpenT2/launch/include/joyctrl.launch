@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="joy" type="joy_node" name="joy" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="dev" value="/dev/input/js0"/>
+        <param name="autorepeat_rate" value="20" />
+    </node>
+</launch>

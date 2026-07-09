@@ -1,0 +1,30 @@
+function_costmap:
+  global_frame: map
+  robot_base_frame: base_link
+  update_frequency: 1.0
+  publish_frequency: -1.0
+  resolution: 0.05
+  plugins: 
+   - {name: elevator_layer, type: "costmap_2d::StaticLayer"}
+   - {name: gate_layer, type: "costmap_2d::StaticLayer"}
+   - {name: motion_layer, type: "costmap_2d::StaticUniteLayer"}
+
+  elevator_layer: 
+    enabled: false
+    map_topic: /elevator_map
+    raw_map: true
+    individual_size: true
+
+  gate_layer: 
+    enabled: false
+    map_topic: /gate_map
+    track_unknown_space: true
+    use_maximum: -1
+    raw_map: true
+    individual_size: true
+
+  motion_layer: 
+    enabled: false
+    unite_map_topics: "vel_map"
+    vel_map: {unite_bits: 3}
+    individual_size: true

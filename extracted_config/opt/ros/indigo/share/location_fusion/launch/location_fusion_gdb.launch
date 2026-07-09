@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="use_sim_time" value="false" />
+
+  <node launch-prefix="gdb -ex run --args" pkg="location_fusion" type="location_fusion_node" name="location_fusion" output="screen">
+    <param name="scan_topic" value="/scan" />
+    <param name="map_topic" value="/map" />
+    <param name="base_to_laser_x" value="0.181" />
+    <param name="base_to_laser_y" value="0.0" />
+    <param name="base_to_laser_z" value="0.17" />
+    <param name="base_to_laser_yaw" value="0.0" />    
+    <param name="occupied_threshold" value="0.15" />
+    <param name="unknowSpace_threshold" value="0.15" />
+    <param name="freeSpace_threshold" value="0.15" />
+    <param name="cloudpointVisual" value="false" />
+    <param name="caculateScoreTimeLimit" value="0.15" />
+
+    <param name="imu_update_time" value="30" />
+    <param name="odom_update_time" value="30" />
+    <param name="ekf_interval_time" value="200" />
+
+    <param name="max_linear_velocity" value="5.0" />
+    <param name="max_angular_velocity" value="5.0" />
+    <param name="max_linear_acceleration" value="0.8" />
+    <param name="max_angular_acceleration" value="0.5" />
+
+    <param name="abnormalLaserCount" value="0" />
+    <param name="isNeedSetLaserPose" value="false" />
+    <param name="isSetLaserPoseByOutsider" value="false" />
+    <param name="fixedScore" value="0.3" />
+    <param name="scoreLimit" value="0.8" />
+    <param name="laserSetPoseLimit" value="0.35" />
+    <param name="outPointLocationDiff" value="0.2" />
+
+  </node>
+
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find location_fusion)/config/fusion.rviz" required="true"/>  -->
+
+</launch>

@@ -1,0 +1,34 @@
+obstacle_range: 2.0
+raytrace_range: 5.0
+footprint: [[0.3150, 0.2125],[0.2750, 0.2525],[-0.2750, 0.2525],[-0.3150, 0.2125],[-0.3150, -0.2125],[-0.2750, -0.2525],[0.2750, -0.2525],[0.3150, -0.2125]]
+footprint_padding: 0.0
+scan: {
+sensor_frame: laser_link,
+observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: LaserScan, topic: /scan, expected_update_rate: 0.3}
+mx_camera_L: {
+sensor_frame: mx_camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.1, obstacle_range: 1.2, data_type: PointCloud2, topic: /mx/cloud1, expected_update_rate: 1.0, marking_allow_timeout: true}
+mx_camera_R: {
+sensor_frame: mx_camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.1, obstacle_range: 1.2, data_type: PointCloud2, topic: /mx/cloud2, expected_update_rate: 1.0, marking_allow_timeout: true}
+camera_1: {
+sensor_frame: camera_1_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_1/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true}
+camera_2: {
+sensor_frame: camera_2_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_2/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true}
+bump: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 1.0, min_obstacle_height: 0.1, data_type: PointCloud2, topic: /bump, expected_update_rate: 1.0, marking_allow_timeout: true}
+gate: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: PointCloud2, topic: /gate_cloud}
+suspend_obs_right: {
+sensor_frame: mx_camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.1, obstacle_range: 1.2, data_type: PointCloud2, topic: /suspend_obs_cloud_right, expected_update_rate: 5.0, marking_allow_timeout: true}
+suspend_obs_left: {
+sensor_frame: mx_camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.1, obstacle_range: 1.2, data_type: PointCloud2, topic: /suspend_obs_cloud_left, expected_update_rate: 5.0, marking_allow_timeout: true}
+schedule_obstacle_position: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 0.1, min_obstacle_height: -0.1, obstacle_range: 2.0, data_type: PointCloud2, topic: /schedule_obstacle_position, expected_update_rate: 0.3, marking_allow_timeout: true}

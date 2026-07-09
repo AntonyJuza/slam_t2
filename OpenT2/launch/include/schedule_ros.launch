@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="log"/>
+    <arg name="RESPAWN" default="true"/>
+	<arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node name="schedule_ros" pkg="schedule_ros" type="schedule_ros_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)"/>
+</launch>

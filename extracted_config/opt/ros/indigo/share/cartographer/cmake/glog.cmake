@@ -1,0 +1,16 @@
+
+
+SET(GLOG_INCLUDE_DIRS
+${KEENON_CROSS_DEPS_DIRS}/include
+)
+
+SET(GLOG_LIBRARY_DIRS
+${KEENON_CROSS_DEPS_DIRS}/lib
+)
+
+SET(GLOG_LIBRARIES
+libglog.so
+)
+
+include_directories(${GLOG_LIBRARY_DIRS})
+link_directories(${GLOG_LIBRARY_DIRS})

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="log"/>
+    <arg name="RESPAWN" default="true"/>
+	<arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node name="topo_mapper" pkg="topo_mapper" type="topo_mapper" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <!-- rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/schedule.yaml" command="load"/-->
+    </node>
+</launch>
+

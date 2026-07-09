@@ -1,0 +1,19 @@
+initial_pose_estimators_matchers:
+    point_matchers:
+        iterative_closest_point:
+            convergence_time_limit_seconds: 2.0 #进行icp收敛时间限制
+            max_correspondence_distance: 3.5 #8.0 #5.0  #3.5设置对应点对之间的最大距离（此值对配准结果影响较大）。修改时会受其他参数影响,导致失效
+            transformation_epsilon: 1e-3  #设置两次变化矩阵之间的差值（通常设置为1e-10便可）；
+            euclidean_fitness_epsilon: 1e-3  #设置收敛条件是均方偏差和小于阈值， 中止迭代；
+            max_number_of_registration_iterations: 200  #最大迭代次数，icp是一个迭代的方法，最多迭代这些次（若结合可视化并逐次显示，可将次数设置为1）； 修改时会受其他参数影响,导致失效
+            max_number_of_ransac_iterations: 0
+            ransac_outlier_rejection_threshold: 0.2
+            match_only_keypoints: false
+            display_cloud_aligment: false
+            maximum_number_of_displayed_correspondences: 0
+            rotation_epsilon: 0.002
+            correspondence_randomness: 50
+            maximum_optimizer_iterations: 10
+            use_reciprocal_correspondences: true #true
+            max_reciprocal_correspondence_distance: 1
+            

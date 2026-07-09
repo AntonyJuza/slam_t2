@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="glonavin" type="glonavin" name="glonavin" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="dev_name" value="/dev/ttyUSB2"/>
+        <param name="frame_id" value="/imu_link"/>
+        <param name="topic_name" value="/imu_data"/>
+    </node>
+</launch>

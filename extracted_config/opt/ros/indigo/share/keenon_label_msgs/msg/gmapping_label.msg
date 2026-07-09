@@ -1,0 +1,8 @@
+float64 x
+float64 y
+float64 z
+float64 yaw
+float64 roll
+float64 pitch
+int64 id
+int64 floor_id

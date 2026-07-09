@@ -1,0 +1,39 @@
+scan_topic: /scan_orig
+map_topic: /map
+checkLabelRobotType: T8
+
+base_to_laser_x: 0.181
+base_to_laser_y: 0.0
+base_to_laser_z: 0.17
+base_to_laser_yaw: 0.0
+occupied_threshold: 0.15
+unknowSpace_threshold: 0.15
+freeSpace_threshold: 0.15
+cloudpointVisual: false
+caculateScoreTimeLimit: 0.15
+
+imu_update_time: 30
+odom_update_time: 30
+ekf_interval_time: 500
+
+max_linear_velocity: 1.2
+max_angular_velocity: 1.5
+max_linear_acceleration: 0.8
+max_angular_acceleration: 0.5
+max_delta_linear: 5.0
+max_delta_angular: 1.0
+
+abnormalLaserCount: 0
+isNeedSetLaserPose: false
+isSetLaserPoseByOutsider: false
+fixedScore: 0.3
+scoreLimit: 0.8
+laserSetPoseLimit: 0.35
+outPointLocationDiff: 0.2
+closePointLocationDiff: 0.2
+closePointYawDiff: 0.3
+
+greenChannelLaserThre: 0.3
+measurementlDiffThre: 0.3
+
+isImuMoveDetection: true

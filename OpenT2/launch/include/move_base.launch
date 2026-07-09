@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="move_base" type="move_base" name="move_base" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="base_local_planner" value="fsm_local_planner/FSMPlannerROS"/>
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/move_base_params.yaml" command="load"/>
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/base_local_planner_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/function_costmap_params.yaml" command="load" />
+    </node>
+
+</launch>

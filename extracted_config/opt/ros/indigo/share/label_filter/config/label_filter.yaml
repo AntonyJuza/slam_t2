@@ -1,0 +1,20 @@
+%YAML:1.0
+
+filter_mode: 0                     # 选择过滤方法,0位置聚类 1距离队列  2无过滤器 -1所有标签观测全部过滤掉
+repeat_label_dis : 3          # 重复标签间最小距离,大于这个距离的重复标签被丢弃
+
+trans_weight : 10             #平移权重最好不超过1e3,否则易出现重影
+rot_weight : 10
+
+pos_cluster :
+    dis_threshold : 0.3         #单个聚类点的范围
+    total_number : 15          #成功聚类时的最小观测次数
+    success_rate : 0.7           #成功聚类的最小概率(最多观测的标签id在聚类点观测中占比)
+
+distance_filter :                   #若采用距离队列
+    max_queue_size : 25    #每个距离队列的最大长度
+    min_range : 0.4               #观测对应到距离队列时，与距离队列均值的最大差异
+    min_sd : 0.2                      #距离队列过滤的最小方差
+    min_detect_dis : 5         #最大观测距离，小于这个距离的观测才进一步处理
+    delay : 5                              #多久未接收到新观测的队列被清除
+

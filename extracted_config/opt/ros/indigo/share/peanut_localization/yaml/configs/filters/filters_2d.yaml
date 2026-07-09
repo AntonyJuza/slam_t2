@@ -1,0 +1,23 @@
+filters:
+    reference_pointcloud:
+        1_voxel_grid:
+            leaf_size_x: 0.1
+            leaf_size_y: 0.1
+            leaf_size_z: 0.1
+            filter_limit_field_name: 'z'
+            filter_limit_min: -0.001
+            filter_limit_max: 1.8
+            downsample_all_data: false
+            save_leaf_layout: false
+            filtered_cloud_publish_topic: 'reference_pointcloud_filtered'
+    scan_pointcloud:
+        1_voxel_grid:
+            leaf_size_x: 0.02
+            leaf_size_y: 0.02
+            leaf_size_z: 0.02
+            filter_limit_field_name: 'z'
+            filter_limit_min: -0.001
+            filter_limit_max: 1.8
+            downsample_all_data: false
+            save_leaf_layout: false
+            filtered_cloud_publish_topic: 'scan_pointcloud_filtered'

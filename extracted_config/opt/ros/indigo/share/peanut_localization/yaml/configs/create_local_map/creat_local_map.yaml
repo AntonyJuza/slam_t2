@@ -1,0 +1,61 @@
+local_map:
+  map_topic: sub_map
+  scan_topic: scan_orig
+  ground_thre: -1.0 # 剔除该阈值以下高度的点
+  got_first_imu: false
+  lidar_is_inverted: false
+  occupancy_grid_map_resolution: 0.05
+  occupancy_threshold: 0.30
+  correlative_occupancy_threshold: 0.10
+  min_pass_threshold: 2.0
+  min_update_distance: 0.15
+  min_update_orientation: 8 # degree
+  min_keyscan_distance: 0.30
+  min_keyscan_orientation: 15 # degree
+  scan_buffer_size: 20   #30
+
+  csm_grid_resolution: 0.02
+  csm_xy_search_range: 0.1
+  csm_angle_search_range: 5
+  csm_xy_search_resolution: 0.02
+  csm_angle_search_resolution: 0.2
+
+  coarse_xy_search_range: 0.5
+  coarse_xy_search_resolution: 0.1
+  coarse_angle_search_range: 20
+  coarse_angle_search_resolution: 2
+
+  scalingFactorTrans: 5.0
+  scalingFactorAngle: 10.0
+
+  gauss_scan_matcher_grid_resolution: 0.05
+  correlative_standard_deviation: 0.03
+  gauss_standard_deviation: 0.12
+  responsePoorThresholdMax: 0.60
+  responsePoorThresholdMin: 0.40
+  highMatchScanThreshold: 0.70
+  hitGroundMode: false # 是否为严重打地模式
+
+  imuMoveDetection: true
+  deltaOdomRadio: 0.1  # 里程计模型比例
+  deltaAngleRadio: 0.1 # 里程计模型角度比例
+  deltaOdomMin: 0.05
+  deltaAngleMin: 0.05
+
+  param_initial_delta_time: 20.0 #崩溃重启恢复定位时间限制(s)
+  OdomModelScoreThreshold: 0.8
+  is_filter_laserScan: false # 是否过滤激光噪点
+  filter_laser_clustering_distance: 0.071
+  filter_laser_clustering_length: 0.171
+  filter_max_range_thresh: 10.0
+  hitGroundModeActive: true #打地优化触发
+  hitGroundTimeLimit: 5 #打地控频
+  odomSlideModeActive: true # true:打滑优先 false:动态障碍物优先
+  ACCUMULATE_NUM: 3
+
+  ClusterTolerance: 0.1
+  MinClusterSize: 1
+  MaxClusterSize: 30
+  remove_obstacle: false
+  T2_inCorridor_Check: false
+  pub_viz_topic: false

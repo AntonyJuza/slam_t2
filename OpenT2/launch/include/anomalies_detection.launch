@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <arg name="CAMERA_TYPE" default="None"/>
+    <param name="camera_type" type="string" value="$(arg CAMERA_TYPE)"/>
+    
+    <node pkg="anomalies_detection" type="location_lost_detecthion_node" name="location_lost_detecthion_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+       <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/anomalies_detection.yaml" command="load"/>
+    </node>
+
+    <node pkg="anomalies_detection" type="elevator_detection_node" name="elevator_detection_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+    </node>
+
+    <node pkg="anomalies_detection" type="sensor_monitor_node" name="sensor_monitor_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+    </node>
+
+</launch>

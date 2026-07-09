@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <arg name="map_virtual_wall_path" default="$(find robot_settings)/sim/world/keenonVirtualWall.yaml"/>
+
+    <include file="$(find robot_settings)/launch/include/map_server.launch">
+        <arg name="map_yaml_path" default="$(arg map_virtual_wall_path)"/>
+        <arg name="map_topic" default="virtual_wall"/>
+        <arg name="OUTPUT_METHOD" default="$(arg OUTPUT_METHOD)"/>
+        <arg name="RESPAWN" default="$(arg RESPAWN)"/>
+    </include>
+</launch>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <arg name="prefix" default="/home/peanut/keenon/idlebag/ros_idle_00000876"/>
+    <arg name="append_date" default="true"/>
+    <arg name="repeat_latched" default="true"/>
+    <arg name="split" default="true"/>
+    <arg name="buffer_size" default="256"/>
+    <arg name="chunk_size" default="768"/>
+    <arg name="min_space" default="1G"/>
+    <arg name="compression" default="B"/>
+    <arg name="max_size" default="200"/>
+
+    <arg name="event_upload_conf" default="$(find keenonrecorder)/yaml/event_upload.yaml" />
+
+    <node pkg="keenonrecorder" type="record_node" name="keenon_rosbag" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="prefix" value="$(arg prefix)"/>
+        <param name="append_date" value="$(arg append_date)"/>
+        <param name="repeat_latched" value="$(arg repeat_latched)"/>
+        <param name="split" value="$(arg split)"/>
+        <param name="buffer_size" value="$(arg buffer_size)"/>
+        <param name="chunk_size" value="$(arg chunk_size)"/>
+        <param name="min_space" value="$(arg min_space)"/>
+        <param name="compression" value="$(arg compression)"/>
+        <param name="max_size" value="$(arg max_size)"/>
+    </node>
+
+    <node pkg="keenonrecorder" type="event_tracking_node" name="event_tracking_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="database_file_path" value="/etc/ros/runtime/database/statistics.db"/>
+        <param name="event_zip_path" value="/etc/ros/runtime/database/statistics.zip"/>
+        <param name="yaml_path" value="$(arg event_upload_conf)"/>
+    </node>
+</launch>

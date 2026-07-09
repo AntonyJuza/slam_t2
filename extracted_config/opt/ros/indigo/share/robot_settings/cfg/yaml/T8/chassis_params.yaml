@@ -1,0 +1,14 @@
+port: /dev/ttyUSBStm32
+send_transform: true
+max_acc: 0.32
+use_imu: false
+use_stm32_imu: true
+mileage_record_filepath: mileage_record
+bothsides_bump: false
+size_sonar: 0
+size_psd: 0
+scan_topic: /scan_orig
+wheel_gauge: 277.0
+wheel_perimeter: 559.55
+imu_expect_rate: 40.0
+imu_monitor: false

@@ -1,0 +1,11 @@
+# request params
+# option_mode 1 increment mapping, 2 laser with vision mapping, 0 stop mapping
+int16 option
+---
+# response params
+time stamp
+int16 floor
+string db_key_sn
+string db_key_time
+string db_key_sub_db_desc
+bool option_result

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="init_location" type="init_location_node"  name="init_location_node" output="screen">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/init_location_params.yaml" command="load"/>
+    </node>
+</launch>

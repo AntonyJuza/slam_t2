@@ -1,0 +1,162 @@
+scan_topic: scan_orig
+frame_ids/map_frame_id: map
+frame_ids/odom_frame_id: odom
+frame_ids/base_link_frame_id: base_link
+frame_ids/sensor_frame_id: laser_link
+subscribe_topic_names/pose_with_covariance_stamped_topic: /initialpose
+subscribe_topic_names/reference_costmap_topic: /map
+publish_tf_map_odom:  true
+use_map_topic: true
+test_bag: false
+test_voxel_grid: false
+general_configurations/publish_tf_map_odom: true
+tracking_out_percentage_thresh: 0.6
+initial_out_percentage_thresh: 0.4
+default_initial_max_correspondence_distance: 1.0 #1.0
+only_odom_max_correspondence_distance: 3.5
+large_scale_max_correspondence_distance: 5.0
+small_scale_max_correspondence_radius: 0.04 #(.)^2
+large_scale_max_correspondence_radius: 100.0 #(.)^2
+large_scale_registration_iterations_count: 200
+out_elev_initial_registration_iterations_count: 30
+default_initial_registration_iterations_count: 200
+odom_delta: 0.15
+d_thresh: 0.05
+a_thresh: 0.05
+min_scan_cloud_range: 0.2
+transform_tolerance: 0.05
+laser_check_interval: 15.0
+use_odom_out_percentage_thresh: 0.2
+odom_alpha1: 0.035
+odom_alpha2: 0.035
+odom_yaw_ratio: 0.03
+odom_alpha1_ratio: 1.5
+better_location_switch: false
+freeSpace_threshold: 0.15
+unknowSpace_threshold: 0.18
+occupied_threshold: 0.16
+default_trans_y: 0.1
+default_trans_x: 0.1
+default_trans_yaw: 0.2
+voxel_grid_size: 0.01
+# 乘梯定位相关 begin
+elevator_location_mode: 2
+elevator_match_ratio: 1.0
+outside_optimize_en: true
+in_elevator_match_ratio: 0.16
+out_elevator_match_ratio: 0.5
+in_elev_punish_unknown_space_ratio: 1.51
+out_elev_punish_unknown_space_ratio: 1.21
+# 乘梯定位相关 end
+# 多线程--tf发布频率
+odom_to_map_tf_publish_hz: 30.0
+# 多线程--处理主业务逻辑频率
+interaction_handle_hz: 50.0
+# BFM相关 begin
+coarse_x_search_range: 0.4
+coarse_y_search_range: 0.4
+coarse_xy_search_resolution: 0.1  
+coarse_angle_search_range: 40.0
+coarse_angle_search_resolution: 0.4
+
+fine_x_search_range: 0.2
+fine_y_search_range: 0.2
+fine_xy_search_resolution: 0.05
+fine_angle_search_range: 5.0
+fine_angle_search_resolution: 0.2
+
+corre_scan_match_score_thresh: 0.5  
+charge_match_space_rato_x: 0.75
+charge_match_pointcloud_type: 1
+# BFM相关 end
+
+en_map_filter: true
+map_filter_radius: 0.16
+map_filter_count: 2
+map_cluster_radius: 0.18
+map_cluster_min: 13
+map_cluster_max: 2000
+sub_map_scan_match_cov: 0.5
+submap_occupied_pointcloud_scope: 0.3
+# 融合定位 begin
+fusion_en: true
+initial_pose_num_for_fusion: 10
+# 融合定位 end
+enable_near_search_table: false
+enable_initial: false # 使用initialpose话题开关
+
+normal:
+  # !是否启用防滑动功能
+  enable: true
+  # !粗感知主方向法向量在所有法向量中所占比例阈值，大于此阈值，则主方向法向量才可用，范围[0,1)
+  major_proportion_threshold: 0.95
+  major_second_proportion_threshold: 0.02
+  # !细感知欠约束场景微小特征,最少应包含的方向向量个数(值调大可区分有效的微小特征与干扰的微小特征)
+  minor_normals_min_size: 8
+  # !单次ICP距离小于(防滑动累计距离乘以该比例参数)的值,则进行一次ICP，用于维持ICP的频率在一定范围内
+  slide_locking_accumulated_scope_prop: 0.3
+  # 粗感知欠约束场景,使用的降采样点云分辨率，单位（米）
+  downsampled_pointcloud_voxel_size: 0.02
+  # 对点云每个点周围一定平方范围[单位(米)]和数量的点[单位(个)]聚类         
+  clustered_pointcloud_nearest_square_scope: 0.16
+  clustered_pointcloud_nearest_min_size: 10
+  # 认为地图黑区一定范围的激光点云是可用点云，单位（米）
+  occupied_pointcloud_scope: 0.05
+  # 将法向量按一定角度范围聚类，单位（度）           
+  cluster_angle_scope: 3
+  # 在主方向一定角度内搜寻方向向量，单位（度）          
+  search_minor_normal_angle_scope: 20.0
+  # 用于微小特征增长数量判定，单位（个）
+  minor_normals_incresed_delta_size: 0
+
+submap:
+  occupied_pointcloud_scope: 0.25
+  threshold_occupied_pointcloud_size: 100
+  ratio_update_from_submap: 0.5
+
+icp:
+  # 1: 低频ICP 2: 高频ICP
+  update_type: 1
+
+# ICP精匹配相关 begin
+re_icp:
+  enable: true
+  dist_occupied_space: 0.11
+  dist_unknown_space: 0.13
+  dist_free_space: 0.05
+  threshold_diff_axis: 0.4
+  threshold_diff_angle: 0.35
+  threshold_outlier_score: 0.4
+  threshold_switch_to_re_icp_mode_score: 0.05
+  threshold_switch_to_icp_mode_diff_axis: 0.07
+  threshold_switch_to_icp_mode_diff_angle: 0.03
+  threshold_switch_to_icp_mode_diff_score: 0.02
+# ICP精匹配相关 end
+
+# CSM精匹配相关 begin
+re_csm:
+  enable: true
+  threshold_csm_match: 0.6
+  delta_score_csm_match: 0.002
+  threshold_csm_elevator: 0.9
+  ## 匹配及搜索相关 begin
+  x_search_range: 0.2
+  y_search_range: 0.2
+  xy_search_resolution: 0.05
+  angle_search_range: 5.0
+  angle_search_resolution: 1.0
+  threshold_occ_dist: 0.06
+  ## 匹配及搜索相关 end
+  no_update_increment: 0.1
+  threshold_no_update_score: 0.8
+  threshold_no_update_delta_time: 2000  
+  threshold_no_update_count: 5  
+# CSM精匹配相关 end
+
+# 埋点相关 begin
+error_report:
+  backend:
+    threshold_submap_score: 0.6
+    threshold_laser_score: 0.6
+    threshold_score_diff: 0.35
+# 埋点相关 end

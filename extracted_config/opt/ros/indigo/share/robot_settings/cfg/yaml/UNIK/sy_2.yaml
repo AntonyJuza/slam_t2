@@ -1,0 +1,7 @@
+del_x: 0.05
+del_y: 0.245
+del_z: 0.705
+remove: 0.2
+offset_x: 0.3
+offset_y: 0.1
+offset_z: 0.3

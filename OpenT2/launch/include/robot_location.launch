@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+
+	<node pkg="robot_location" type="front_end_node"  name="front_end_node"  respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)" >
+	<rosparam file="$(find robot_location)/launch/common_FrontEnd.yaml"  command="load"/>
+	</node>
+
+	<node pkg="robot_location" type="srf_node"  name="srf_node"  respawn="$(arg RESPAWN)" clear_params="true" output="$(arg OUTPUT_METHOD)" >
+	<rosparam file="$(find robot_location)/launch/common_SRF.yaml"  command="load"/>
+	</node>
+</launch>
+

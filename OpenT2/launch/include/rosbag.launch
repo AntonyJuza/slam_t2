@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="BAG_DIR" default="/home/peanut/keenon/bag"/>
+    <arg name="BAG_NAME" default="ros"/>
+    <arg name="BAG_MAX_SIZE" default="200"/>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="true"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <arg name="RECORD_TOPIC_LIST" value="
+    	/add_label
+        /amcl_pose_laser
+        /app_cmd_charge
+        /app_navigation_status
+        /battery_state
+        /better_location_pose
+        /beam
+        /block_pcl
+        /bump
+        /charge_cmd_toSTM32
+        /charge_report_toUI
+        /charge_state_fromSTM32
+        /charge_task/status
+        /charge_task/result
+        /charge_task/goal
+        /charge_task/feedback
+        /charge_task/cancel
+        /charge_fake_goal
+        /charge_trigger
+        /chassis_imu_data
+        /chassis_sensor
+        /cmd_vel
+        /elevator_map
+        /elevator_position
+        /elevator_request
+        /elevator_response
+        /elevator_state
+        /elevator_task_status
+        /elev_detect_cloud
+        /elev_detect_cloud2
+        /elev_pos_state
+        /elev_process_signal
+        /elev_loc_signal
+        /enable_urgency_button
+        /encoder_odom
+        /encoder_raw
+        /error_report
+        /gate_cloud
+        /gate_cmd
+        /gate_map
+        /gate_status
+        /imu_raw
+        /init_location_pose
+        /initialpose
+	/label_map
+	/label_ref
+        /localization/robot_pose
+        /map
+        /map_metadata
+        /mapping_status
+        /matching_output_model
+        /matching_output_scan
+        /mileage
+        /min_dy_obs_distance
+        /motor_error_code
+        /motor_lock
+        /motor_lock_status
+        /move_base/KPlannerROS/plan_calc
+        /move_base/KPlannerROS/plan_output
+        /move_base/KPlannerROS/path_1
+        /move_base/KPlannerROS/path_2
+        /move_base/TebLocalPlannerROS/teb_poses
+        /move_base/cancel
+        /move_base/current_goal
+        /move_base/feedback
+        /move_base/global_costmap/costmap
+        /move_base/global_costmap/costmap_updates
+        /move_base/global_costmap/footprint
+        /move_base/goal
+        /move_base/local_costmap/costmap
+        /move_base/local_costmap/costmap_updates
+        /move_base/local_costmap/footprint
+        /move_base/move_base_global_plan
+        /move_base/result
+        /move_base/status
+        /move_base_simple/goal
+        /odom
+        /odom_combined
+        /particlecloud
+        /reboot
+        /robot_current_floor
+        /robot_elevator_percent
+        /robot_pose
+        /robot_state
+        /rosout
+        /run_amcl
+        /run_mapping
+        /run_rosbag
+        /save_new_map
+        /scan
+        /scan_back_orig
+        /scan_front_orig
+        /scan_orig
+        /schedule_path
+        /schedule_speed_ctl
+        /schedule_state
+        /seller_fake_goal
+        /seller_report_toUI
+        /seller_request
+        /seller_task/cancel
+        /seller_task/feedback
+        /seller_task/goal
+        /seller_task/result
+        /seller_task/status
+        /set_block_state_duration
+        /shortest_path_activate
+        /stm32_version
+        /suspend_obs_cloud_right
+        /suspend_obs_cloud_left
+        /tf
+        /tf_static
+        /urgency_button_status
+        /urgency_stop
+        /virtual_wall
+        /vel_map
+        /version
+        /welcome
+        /feature_detection_node/pairs_leg_cloud
+    "/>
+
+    <node name="rosbag" pkg="rosbag" type="record" args="$(arg RECORD_TOPIC_LIST) --lz4 --split --size=$(arg BAG_MAX_SIZE) --output-prefix=$(arg BAG_DIR)/$(arg BAG_NAME)" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+    </node>
+
+</launch>

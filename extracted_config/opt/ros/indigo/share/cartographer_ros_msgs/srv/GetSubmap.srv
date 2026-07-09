@@ -1,0 +1,5 @@
+# Get the map as a nav_msgs/OccupancyGrid
+int32 submap_index
+bool write_map    
+---
+nav_msgs/OccupancyGrid map

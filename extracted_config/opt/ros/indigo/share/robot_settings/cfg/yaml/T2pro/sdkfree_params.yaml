@@ -1,0 +1,9 @@
+host: 192.168.64.103
+port: 2111
+frame_id: laser_link
+range_min: 0.05
+range_max: 30
+start_angle: -45
+stop_angle: 225
+offset_angle: -90
+filterswitch: true

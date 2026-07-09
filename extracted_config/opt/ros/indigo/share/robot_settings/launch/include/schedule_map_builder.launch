@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="schedule_map_builder" type="schedule_map_builder_node" name="schedule_map_builder" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/costmap_common_params.yaml" command="load" ns="local" />
+    </node>
+</launch>

@@ -1,0 +1,16 @@
+
+
+SET(GFLAGS_INCLUDE_DIRS
+${KEENON_CROSS_DEPS_DIRS}/include
+)
+
+SET(GFLAGS_LIBRARY_DIRS
+${KEENON_CROSS_DEPS_DIRS}/lib
+)
+
+SET(GFLAGS_LIBRARIES
+libgflags.so
+)
+
+include_directories(${GFLAGS_INCLUDE_DIRS})
+link_directories(${GFLAGS_LIBRARY_DIRS})

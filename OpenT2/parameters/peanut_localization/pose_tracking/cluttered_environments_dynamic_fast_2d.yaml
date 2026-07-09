@@ -1,0 +1,48 @@
+tracking_matchers:
+    ignore_height_corrections: false
+    point_matchers:
+        iterative_closest_point_2d:
+            convergence_time_limit_seconds: 0.05 #0.035 #0.1
+            max_correspondence_distance: 0.1 #0.2
+            transformation_epsilon: 1e-7
+            euclidean_fitness_epsilon: 1e-7
+            max_number_of_registration_iterations: 20 #15 #15
+            max_number_of_ransac_iterations: 0
+            ransac_outlier_rejection_threshold: 0.10
+            display_cloud_aligment: false
+            maximum_number_of_displayed_correspondences: 0
+            rotation_epsilon: 0.00002
+            correspondence_randomness: 50
+            maximum_optimizer_iterations: 10
+            use_reciprocal_correspondences: false #false
+
+
+outlier_detectors:
+    euclidean_outlier_detector:
+        max_inliers_distance: 0.20 #0.2
+        aligned_pointcloud_outliers_publish_topic: 'aligned_pointcloud_outliers'
+        aligned_pointcloud_inliers_publish_topic: 'aligned_pointcloud_inliers'
+
+
+cloud_analyzers:
+    #compute_inliers_angular_distribution: true
+    #compute_outliers_angular_distribution: true
+    angular_distribution_analyzer:
+        number_of_angular_bins: 180 #360 #180
+
+
+transformation_validators:
+    euclidean_transformation_validator:
+        max_transformation_angle: 1.2 #1.2
+        max_transformation_distance: 0.8 #0.8
+        max_new_pose_diff_angle: 1.3 #1.3
+        max_new_pose_diff_distance: 0.8 #0.8
+        max_root_mean_square_error: 0.25
+        min_inliers_angular_distribution: 0.1
+        max_outliers_percentage: 0.6
+
+
+transformation_validators_tracking_recovery:
+    euclidean_transformation_validator:
+        max_root_mean_square_error: 0.25
+        max_outliers_percentage: 0.65

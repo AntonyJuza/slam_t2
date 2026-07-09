@@ -1,0 +1,18 @@
+#common
+footprint_type: square
+footprint_length: 0.63
+footprint_width: 0.55
+scan_topic: scan
+virtualwall_topic: virtual_wall
+base_frame: base_link
+odom_frame: odom
+map_frame: map
+controller_frequency: 20.0
+
+#charge_task
+charge_dist_1: 0.65
+charge_dist_2: 0.47
+charge_dist_3: 0.16
+charge_score: 0.035
+charge_scan_back: true
+charge_pile : default

@@ -1,0 +1,17 @@
+
+
+SET(GOMP_INCLUDE_DIRS
+${KEENON_CROSS_DEPS_DIRS}/include
+)
+
+SET(GOMP_LIBRARY_DIRS
+${KEENON_CROSS_DEPS_DIRS}/lib
+)
+
+SET(GOMP_LIBRARIES
+    libgomp.a
+)
+
+include_directories(${GOMP_INCLUDE_DIRS})
+link_directories(${GOMP_LIBRARY_DIRS})
+

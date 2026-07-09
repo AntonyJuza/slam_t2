@@ -1,0 +1,245 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="ROBOT_OUTPUT_METHOD" default="log"/>
+    <arg name="ROBOT_RESPAWN" default="true"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    <arg name="ROBOT_GROUP" default="restaurant"/>
+    <arg name="LOCATION_TYPE" default="peanut_localization"/>
+    <arg name="USE_AMCL" default="false"/>
+    <arg name="LIDAR_TYPE" default="keli"/>
+    <arg name="VSLAM" default="false"/>
+    <arg name="LIDAR_NUM" default="1"/>
+    <arg name="USE_LDLIDAR" default="false"/>
+    <arg name="USE_CAMERA" default="true"/>
+    <arg name="CAMERA_TYPE" default="astra"/>
+    <arg name="CAMERA_NUM" default="1"/>
+    <arg name="USE_BAGRECORD" default="false"/>
+    <arg name="USE_DYDETECT" default="true"/>
+    <arg name="T2_SINGLE_DIRE" default="true"/>
+    <arg name="USE_ANOMALIES_DETECT" default="true"/>
+    <arg name="USE_SUSPEND" default="false"/>
+    <arg name="SCHEDULE_SW" default="true"/>
+    <arg name="USE_DROP_RESISTENT" default="false"/>
+    <arg name="USE_LABEL" default="true"/>
+
+    <param name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    <param name="ROBOT_GROUP" value="$(arg ROBOT_GROUP)"/>
+    <rosparam file="$(find robot_settings)/cfg/yaml/common/common_params.yaml" command="load" ns="persistence_params" />
+
+    <include file="$(find robot_settings)/launch/include/run_fdl.launch" if="$(arg USE_DROP_RESISTENT)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/suspend_cloud.launch" if="$(arg USE_SUSPEND)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/database.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/keenonrecorder.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/anomalies_detection.launch" if="$(arg USE_ANOMALIES_DETECT)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+      <arg name="CAMERA_TYPE" value="$(arg CAMERA_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/robot_state_publisher.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+    <include file="$(find robot_settings)/launch/include/rosbridge_websocket_control.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/tf2_web_republisher.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/coap_server.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+     <include file="$(find robot_settings)/launch/include/web_backend.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/$(arg LIDAR_TYPE)_$(arg LIDAR_NUM).launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/lidar_filter_$(arg LIDAR_NUM).launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+      <arg name="LIDAR_TYPE" value="$(arg LIDAR_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/chassis.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/switch_map.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/$(arg LOCATION_TYPE).launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+      <arg name="ROBOT_GROUP" value="$(arg ROBOT_GROUP)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/move_base_teb.launch" if="$(arg T2_SINGLE_DIRE)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/move_base_teb_dual_direction.launch" unless="$(arg T2_SINGLE_DIRE)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/gmapping.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/cartographer_$(arg LIDAR_NUM).launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/ui_interactive.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/schedule_ros.launch" if="$(arg SCHEDULE_SW)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/topo_map_generator.launch" >
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/lora_driver.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/dynamic_detector.launch" if="$(arg USE_DYDETECT)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/matching_task.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/virtual_generator.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/robot_settings.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/multi_goals_planner.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/schedule_map_builder.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+    
+    <include file="$(find robot_settings)/launch/include/label_fusion.launch" if="$(arg USE_LABEL)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/ldlidar.launch" if="$(arg USE_LDLIDAR)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/vslam.launch" if="$(arg VSLAM)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/$(arg CAMERA_TYPE)_$(arg CAMERA_NUM).launch" if="$(arg USE_CAMERA)">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/location_fusion.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+    <include file="$(find robot_settings)/launch/include/ros_busy_map.launch">
+      <arg name="OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+    </include>
+
+</launch>

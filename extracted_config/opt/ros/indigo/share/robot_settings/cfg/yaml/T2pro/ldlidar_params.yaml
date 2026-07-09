@@ -1,0 +1,4 @@
+product_name: LDLiDAR_STL06P
+topic_name: scan_back
+port_name: /dev/ttyUSBLidar
+frame_id: laser_back_link

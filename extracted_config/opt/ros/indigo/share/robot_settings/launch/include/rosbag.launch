@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="BAG_DIR" default="/home/peanut/keenon/bag"/>
+    <arg name="BAG_NAME" default="ros"/>
+    <arg name="BAG_MAX_SIZE" default="200"/>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="true"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+    
+    <arg name="BAG_PATH" value="/home/peanut/keenon/"/>
+
+    <!--Do not input chinese in this xml-->
+    <arg name="RECORD_TOPIC_LIST" value="
+        <!--------------------locate group topics-------------------->
+        /encoder_raw
+        /fusion_pose
+        /imu_raw
+        /label_ref
+        /label_robot_pose
+        /localization/robot_pose
+        /odom_combined
+        /stm32_version
+        /tf
+        /tf_static
+        /vslam_robot_pose
+        /vslam_match_pose
+        /narrow_result
+        /run_mapping
+
+        <!--------------------nav 1 group topics-------------------->
+        /chassis_sensor
+        /cmd_vel
+        /motor_error_code
+        /motor_lock
+        /motor_lock_status
+        /motor_speed
+        /move_base/TebLocalPlannerROS/obstacles
+        /move_base/TebLocalPlannerROS/teb_poses
+        /move_base/current_goal
+        /move_base/feedback
+        /move_base/global_costmap/footprint
+        /move_base/goal
+        /move_base/local_costmap/costmap
+        /move_base/move_base_global_plan
+        /move_base/move_base_global_plan_local
+        /move_base/result
+        /move_base/static_info/costmap
+        /scan_back_orig
+        /scan_front_orig
+        /scan_orig
+        /urgency_button_status
+        /urgency_stop
+        /move_base/KPlannerROS/SDP_section_center_line
+        /move_base/KPlannerROS/SDP_samples
+
+        <!--------------------nav 2 group topics-------------------->
+        /app_navigation_status
+        /battery_state
+        /charge_cmd_toSTM32
+        /charge_report_toUI
+        /charge_state_fromSTM32
+        /charge_task/result
+        /charge_task/goal
+        /charge_task/feedback
+        /charge_trigger
+        /elevator_map
+        /elev_detect_cloud
+        /elev_detect_cloud2
+        /error_report
+        /gate_cloud
+        /gate_cmd
+        /gate_map
+        /gate_status
+        /map
+        /mapping_status
+        /mask_map
+        /mask_map_updates
+        /matching_output_model
+        /matching_output_scan
+        /min_dy_obs_distance
+        /robot_current_floor
+        /robot_elevator_percent
+        /robot_elevator_position
+        /ros_version
+        /seller_task/feedback
+        /seller_task/goal
+        /seller_task/result
+        /virtual_wall
+        /vel_map
+        /welcome
+
+        <!--------------------nav 3 group topics-------------------->
+        /schedule_path
+        /schedule_speed_ctl
+        /schedule_state
+        /schedule_robots_position
+
+        <!--------------------other group topics-------------------->
+        /fdl/obstacles
+        /fdl/obs_low
+        /fdl/obs_cliff
+    "/>
+
+</launch>

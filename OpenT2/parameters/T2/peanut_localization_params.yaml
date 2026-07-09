@@ -1,0 +1,18 @@
+scan_topic: scan
+frame_ids/map_frame_id: map
+frame_ids/odom_frame_id: odom
+frame_ids/base_link_frame_id: base_link
+frame_ids/sensor_frame_id: laser_link
+subscribe_topic_names/pose_with_covariance_stamped_topic: /initialpose
+subscribe_topic_names/reference_costmap_topic: /map
+publish_tf_map_odom:  true
+use_map_topic: true
+test_bag: false
+general_configurations/publish_tf_map_odom: true
+out_percentage_thresh: 0.4
+d_thresh: 0.05
+a_thresh: 0.05
+min_scan_cloud_range: 0.2
+transform_tolerance: 0.05
+better_location_switch: false
+

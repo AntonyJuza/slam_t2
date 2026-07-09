@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+	<arg name="USE_AMCL" default="false"/>
+	<node pkg="robot_location" type="tf_maintainer_node"  name="tf_maintainer_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)" if="$(arg USE_AMCL)">
+	</node>
+	<node pkg="robot_location" type="odom_update_node"  name="odom_update_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+	</node>
+</launch>

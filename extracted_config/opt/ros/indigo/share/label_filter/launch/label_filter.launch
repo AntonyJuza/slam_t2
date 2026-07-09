@@ -1,0 +1,9 @@
+<launch>
+  <param name="/use_sim_time" value="false" />
+  <arg name="OUTPUT_METHOD" default="log"/>
+  <arg name="RESPAWN" default="false"/>
+  <!--node pkg="tf" type="static_transform_publisher" name="fix_camera" args="0 0 0 0 0 0 base_link label_camera_link  10" />
+  <node pkg="tf" type="static_transform_publisher" name="fix_map" args="0 0 0 0 0 0 map base_link 10" /-->
+  <node pkg="label_filter" type="label_filter_node" name="ros_label_filter" args="$(find label_filter)/config/label_filter.yaml" output="$(arg OUTPUT_METHOD)" respawn="$(arg RESPAWN)">
+  </node>
+</launch>

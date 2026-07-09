@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="virtual_wall_generator" type="virtual_wall_generator_node" name="virtual_wall_generator" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+    </node>
+
+</launch>

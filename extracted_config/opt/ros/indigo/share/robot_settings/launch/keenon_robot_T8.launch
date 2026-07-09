@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="ROBOT_OUTPUT_METHOD" default="log"/>
+    <arg name="ROBOT_RESPAWN" default="true"/>
+    <arg name="ROBOT_TYPE" default="T8"/>
+    <arg name="ROBOT_GROUP" default="restaurant"/>
+    <arg name="LOCATION_TYPE" default="peanut_localization"/>
+    <arg name="USE_AMCL" default="false"/>
+    <arg name="LIDAR_TYPE" default="free"/>
+    <arg name="VSLAM" default="false"/>
+    <arg name="LIDAR_NUM" default="1"/>
+    <arg name="USE_LDLIDAR" default="false"/>
+    <arg name="USE_CAMERA" default="true"/>
+    <arg name="CAMERA_TYPE" default="mx"/>
+    <arg name="CAMERA_NUM" default="2"/>
+    <arg name="USE_BAGRECORD" default="true"/>
+    <arg name="USE_DYDETECT" default="true"/>
+    <arg name="T2_SINGLE_DIRE" default="true"/>
+    <arg name="USE_ANOMALIES_DETECT" default="true"/>
+    <arg name="USE_SUSPEND" default="false"/>
+    <arg name="SCHEDULE_SW" default="true"/>
+    <arg name="USE_DROP_RESISTENT" default="true"/>
+    <arg name="USE_LABEL" default="true"/>
+    <param name="robot/init_origin_floor" value="1"/>
+    <param name="init_location_node/location_mode" value="charge_mode"/>
+    <param name="elevator_location_mode" value="2"/>
+    <param name="navigation/loop_line_switch" value="true"/>
+    <param name="vslam_available" value="$(arg VSLAM)"/>
+
+    <include file="$(find robot_settings)/launch/robot_common.launch">
+      <arg name="ROBOT_OUTPUT_METHOD" value="$(arg ROBOT_OUTPUT_METHOD)" />
+      <arg name="ROBOT_RESPAWN" value="$(arg ROBOT_RESPAWN)"/>
+      <arg name="ROBOT_TYPE" value="$(arg ROBOT_TYPE)"/>
+      <arg name="ROBOT_GROUP" value="$(arg ROBOT_GROUP)"/>
+      <arg name="LOCATION_TYPE" value="$(arg LOCATION_TYPE)"/>
+      <arg name="USE_AMCL" value="$(arg USE_AMCL)"/>
+      <arg name="LIDAR_TYPE" value="$(arg LIDAR_TYPE)"/>
+      <arg name="VSLAM" value="$(arg VSLAM)"/>
+      <arg name="LIDAR_NUM" value="$(arg LIDAR_NUM)"/>
+      <arg name="USE_LDLIDAR" value="$(arg USE_LDLIDAR)"/>
+      <arg name="USE_CAMERA" value="$(arg USE_CAMERA)"/>
+      <arg name="CAMERA_TYPE" value="$(arg CAMERA_TYPE)"/>
+      <arg name="CAMERA_NUM" value="$(arg CAMERA_NUM)"/>
+      <arg name="USE_BAGRECORD" value="$(arg USE_BAGRECORD)"/>
+      <arg name="USE_DYDETECT" value="$(arg USE_DYDETECT)"/>
+      <arg name="T2_SINGLE_DIRE" value="$(arg T2_SINGLE_DIRE)"/>
+      <arg name="USE_ANOMALIES_DETECT" value="$(arg USE_ANOMALIES_DETECT)"/>
+      <arg name="USE_SUSPEND" value="$(arg USE_SUSPEND)"/>
+      <arg name="SCHEDULE_SW" value="$(arg SCHEDULE_SW)"/>
+      <arg name="USE_DROP_RESISTENT" value="$(arg USE_DROP_RESISTENT)"/>
+      <arg name="USE_LABEL" value="$(arg USE_LABEL)"/>
+    </include>
+
+</launch>

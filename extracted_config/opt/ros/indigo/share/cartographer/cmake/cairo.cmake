@@ -1,0 +1,15 @@
+
+
+SET(CAIRO_INCLUDE_DIRS
+    ${KEENON_CROSS_DEPS_DIRS}/include/cairo
+)
+
+SET(CAIRO_LIBRARY_DIRS
+    ${KEENON_CROSS_DEPS_DIRS}/lib
+)
+
+SET(CAIRO_LIBRARIES
+    libcairo.so
+)
+
+link_directories(${CAIRO_LIBRARY_DIRS})

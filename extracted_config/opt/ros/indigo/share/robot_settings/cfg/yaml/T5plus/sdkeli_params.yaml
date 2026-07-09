@@ -1,0 +1,18 @@
+min_ang: -1.60
+max_ang: 1.60
+frame_id: laser_link
+range_min: 0.01
+range_max: 30.0
+hostname: 192.168.64.100
+port: 2112
+timelimit: 5
+checkframe: true
+
+#shielded_ang1_begin: 2.40
+#shielded_ang1_end: 2.40
+#shielded_ang2_begin: 2.40
+#shielded_ang2_end: 2.40
+#shielded_ang3_begin: 2.40
+#shielded_ang3_end: 2.40
+#shielded_ang4_begin: 2.40
+#shielded_ang4_end: 2.40

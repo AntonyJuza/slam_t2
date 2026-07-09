@@ -1,0 +1,20 @@
+odom_frame_id: odom
+base_frame_id: base_link
+laser_odom_frame_id: srf
+
+encoder_topic: "/encoder_raw"
+imu_topic: "/chassis_imu_data"
+laser_odom_topic: "/laser_odom"
+laser_scan_topic: "/scan_orig"
+
+imu_hz: 50.0
+encoder_hz: 50.0
+laser_hz: 30.0
+
+max_linear_velocity:  2.0    # m/s
+max_angular_velocity: 6.0  # rad/s
+
+one_degree_in_radian: 0.01745    # 1 degree = 0.01745 rad
+
+# for testing
+base_frame_test_id: base_link_test

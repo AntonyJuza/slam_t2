@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="log"/>
+    <arg name="RESPAWN" default="true"/>
+	<arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node name="schedule_ros" pkg="schedule_ros" type="schedule_ros_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/G1/costmap_common_params.yaml" command="load" ns="g1" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/G2/costmap_common_params.yaml" command="load" ns="g2" />
+
+        <rosparam file="$(find robot_settings)/cfg/yaml/W1/costmap_common_params.yaml" command="load" ns="w1" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/W3/costmap_common_params.yaml" command="load" ns="w3" />
+
+        <rosparam file="$(find robot_settings)/cfg/yaml/T1/costmap_common_params.yaml" command="load" ns="t1" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T2/costmap_common_params.yaml" command="load" ns="t2" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T2pro/costmap_common_params.yaml" command="load" ns="t2pro" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T5/costmap_common_params.yaml" command="load" ns="t5" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T5pro/costmap_common_params.yaml" command="load" ns="t5pro" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T5plus/costmap_common_params.yaml" command="load" ns="t5plus" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T6/costmap_common_params.yaml" command="load" ns="t6" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/T8/costmap_common_params.yaml" command="load" ns="t8" />
+    </node>
+    </launch>

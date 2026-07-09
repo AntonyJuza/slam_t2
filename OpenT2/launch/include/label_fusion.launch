@@ -1,0 +1,8 @@
+<launch>
+  <arg name="OUTPUT_METHOD" default="screen"/>
+  <arg name="RESPAWN" default="false"/>
+  <arg name="ROBOT_TYPE" default="peanut"/>
+  <arg name="rviz_visualization" default="0"/>
+  <node pkg="label_fusion" type="label_fusion_node" name="ros_label_fusion" args="$(arg rviz_visualization)" output="$(arg OUTPUT_METHOD)" respawn="$(arg RESPAWN)">
+  </node>
+</launch>

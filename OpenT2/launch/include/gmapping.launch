@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="GmappingMapTopic" default="gmapping_map"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/gmapping_online_params.yaml" command="load" />
+        <remap from="map" to="$(arg GmappingMapTopic)"/>
+    </node>
+
+</launch>

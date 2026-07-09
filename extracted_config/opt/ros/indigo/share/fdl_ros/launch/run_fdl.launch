@@ -1,0 +1,11 @@
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="T5"/>
+
+    <node name="fdl_ros_node" pkg="fdl_ros" type="fdl_ros_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)"/>
+
+
+<!--     <node name="fdl_ros_sensor" pkg="fdl_ros" type="fdl_ros_ob_sensor_node" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)"/> -->
+
+</launch>

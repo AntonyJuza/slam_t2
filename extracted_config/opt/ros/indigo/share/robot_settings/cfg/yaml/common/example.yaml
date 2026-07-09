@@ -1,0 +1,14 @@
+bool_param: true
+double_param: 0.1
+footprint: '[[0.254,0.18],[0.18,0.25],[-0.253,0.22],[-0.253,-0.22],[0.18,-0.25],[0.254,-0.18]]'
+int_param: 1
+move_base:
+  sub_name_space: {sub_param_3: aaa, sub_param_4: 123}
+  sub_param_1: abc
+  sub_param_2: 1.0
+str_param: abcde
+vector_param: [abc, def, ghi]
+xml_param:
+- {kk: 2, str_name: asd, val: 123}
+- {kk: 2, str_name: fgh, val: 456}
+- {kk: 2, str_name: jkl, val: 789}

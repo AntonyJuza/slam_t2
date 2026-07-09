@@ -1,0 +1,5 @@
+laser_likelihood_max_dist:  0.6
+tree_map_height: 20.0
+tree_map_width: 20.0
+depth: 16
+mode: static_map

@@ -1,0 +1,43 @@
+controller_frequency: 20.0
+controller_patiente: 15.0
+enable_block_wait: false
+allow_location_fail_move: false
+pause_costmaps: true
+
+#elevator
+elevator_stuck_overtime: 10.0
+elevator_inelev_reach_goal_overtime: 5.0
+elevator_inelev_rotate_overtime: 10.0
+elevator_open_wait_overtime: 10.0
+elevator_crowded_wait_overtime: 10.0
+elevator_moveout_wait_door_open_overtime: 8.0
+elevator_task_move_in_overtime: 15.0
+use_elevator_crowd_detector: true
+use_elevator_door_detector: true
+elevator_length: 1.6
+
+#gate
+open_gate_distance: 2.0
+
+mileage_report_offset: 0.0
+stop_distance: 0.6
+obs_lifetime: 0.0
+front_obs_lifetime: 0.0
+
+#narrow passage
+min_passage_width: 0.0
+
+planner_frequency: 5.0
+max_planning_retries: 500 #planner_frequency*100
+KPlannerROS:
+  threshold_path_change_times: 30 #6*planner_frequency
+  narrow_side_dist: 0.15
+  wide_side_dist: 0.25
+  wider_side_dist: 0.35
+  
+area_back_check_range_length: 0.5
+area_back_check_range_width: 0.10
+robot_length: 0.68
+
+#other
+change_goal_blind_angle: 1.5

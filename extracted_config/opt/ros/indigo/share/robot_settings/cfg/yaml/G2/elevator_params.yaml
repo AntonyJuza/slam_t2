@@ -1,0 +1,4 @@
+use_elev_test_mode: false
+mqtt_server_ip: 47.96.156.255
+sub_server_topic: elevtopic_test
+pub_server_topic: robottopic_test

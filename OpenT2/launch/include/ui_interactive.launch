@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="interactive" type="interactive_node" name="interactive" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/interactive_params.yaml" command="load"/>
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/init_location_params.yaml" command="load"/>
+    </node>
+
+</launch>

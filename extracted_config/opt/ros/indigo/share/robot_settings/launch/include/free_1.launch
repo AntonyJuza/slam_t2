@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+  <!-- C200 Driver -->
+  <node pkg="free_lidar_driver" type="free_lidar_driver_node" name="free_lidar_driver_node" respawn="$(arg RESPAWN)" output="screen">
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/sdkfree_params.yaml" command="load"/>
+  </node>
+
+  <!-- RVIZ -->
+  <!--node pkg="rviz" type="rviz" name="rviz" args="-d $(find c200_lidar)/rviz/rviz.rviz" required="true" /-->
+
+</launch>

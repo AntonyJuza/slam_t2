@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="human_recognition" type="human_recognition" name="human_recognition" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/human_recognition_params.yaml" command="load"/>
+    </node>
+
+</launch>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="move_base" type="move_base" name="move_base" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="base_global_planner" value="kplanner/KPlannerROS"/>
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/move_base_params.yaml" command="load"/>
+        <param name="enable_block_wait" value="false"/>
+        <param name="allow_location_fail_move" value="true"/>
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/teb_local_planner_params.yaml" command="load" />
+<!--        <rosparam file="$(find robot_settings)/cfg/yaml/$(arg ROBOT_TYPE)/function_costmap_params.yaml" command="load" />-->
+        <param name="/global_costmap/scan/sensor_frame" value="base_laser_link"/>
+        <param name="/local_costmap/scan/sensor_frame" value="base_laser_link"/>
+        <param name="/global_costmap/update_frequency" value="5.0"/>
+        <param name="/global_costmap/publish_frequency" value="5.0"/>
+        <param name="/local_costmap/update_frequency" value="5.0"/>
+        <param name="/local_costmap/publish_frequency" value="5.0"/>
+    </node>
+
+</launch>

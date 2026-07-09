@@ -1,0 +1,9 @@
+start_x: 0.0
+start_y: 0.0
+diff_thre: 70
+detect_interval: 0.1
+rectangle_length: 2.0
+rectangle_width: 2.0
+cost_thre: 100
+debug_output: false
+announce_interval: 0.0

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <param name="robot/init_origin_floor" value="11"/>
+
+    <include file="$(find robot_settings)/launch/include/stage.launch"/>
+    <include file="$(find robot_settings)/launch/include/database.launch"/>
+    <include file="$(find robot_settings)/launch/include/coap_server.launch"/>
+    <include file="$(find robot_settings)/launch/include/switch_map.launch"/>
+    <include file="$(find robot_settings)/launch/include/robot_location.launch"/>
+    <include file="$(find robot_settings)/launch/include/init_location.launch"/>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+    <include file="$(find robot_settings)/launch/include/rosbridge_websocket_control.launch"/>
+    <include file="$(find robot_settings)/launch/include/tf2_web_republisher.launch"/>
+    <include file="$(find robot_settings)/launch/include/web_backend.launch"/>
+    <include file="$(find robot_settings)/launch/include/gmapping.launch"/>
+    <include file="$(find robot_settings)/launch/include/amcl.launch"/>
+    <include file="$(find robot_settings)/launch/include/move_base_teb_sim.launch"/>
+    <include file="$(find robot_settings)/launch/include/ui_interactive.launch"/>
+    <include file="$(find robot_settings)/launch/include/virtual_generator.launch"/>
+    <include file="$(find robot_settings)/launch/include/robot_settings.launch"/>
+
+</launch>

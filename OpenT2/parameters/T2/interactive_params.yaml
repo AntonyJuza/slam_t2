@@ -1,0 +1,18 @@
+pose_config_file_path: /etc/ros/runtime/pose/pose.json
+gate_config_file_path: /etc/ros/runtime/pose/gate.json
+elevator_config_file_path: /etc/ros/runtime/pose/elevator.json
+map_config_file_path: /etc/ros/runtime/maps/map.json
+label_config_file_path: /etc/ros/runtime/maps/label.json
+init_origin_floor: 1
+have_elevator: false
+heart_beat_send_duration: 30
+max_call_elevator_times: 5
+# Call interval
+max_recall_elevator_time: 5
+max_task_time: 720
+max_wait_elevator_arrive_time: 180
+max_wait_response_time: 5
+max_lora_wait_response_time: 0.5
+max_4g_wait_response_time: 5
+rosbagStatus: true
+serial_port: /dev/ttyUSBLoRa

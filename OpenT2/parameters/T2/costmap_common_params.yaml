@@ -1,0 +1,28 @@
+obstacle_range: 2.0
+raytrace_range: 5.0
+footprint: [[0.3150, 0.2125],[0.2750, 0.2525],[-0.2750, 0.2525],[-0.3150, 0.2125],[-0.3150, -0.2125],[-0.2750, -0.2525],[0.2750, -0.2525],[0.3150, -0.2125]]
+footprint_padding: 0.0
+scan: {
+sensor_frame: laser_link,
+observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: LaserScan, topic: /scan, expected_update_rate: 5.0}
+mx_camera_L: {
+sensor_frame: mx_camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /mx/cloud1, expected_update_rate: 1.0, marking_allow_timeout: true}
+mx_camera_R: {
+sensor_frame: mx_camera_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /mx/cloud2, expected_update_rate: 1.0, marking_allow_timeout: true}
+camera_1: {
+sensor_frame: camera_1_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_1/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true}
+camera_2: {
+sensor_frame: camera_2_link,
+observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_2/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true}
+bump: {
+sensor_frame: bump_link,
+observation_persistence: 0.0, max_obstacle_height: 1.0, min_obstacle_height: 0.1, data_type: PointCloud2, topic: /bump, expected_update_rate: 1.0, marking_allow_timeout: true}
+gate: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: PointCloud2, topic: /gate_cloud}
+foot: {
+sensor_frame: base_link,
+observation_persistence: 0.0, max_obstacle_height: 0.5, min_obstacle_height: 0.0, data_type: PointCloud, topic:  /feature_detection_node/pairs_leg_cloud, expected_update_rate: 1.0, marking_allow_timeout: true}

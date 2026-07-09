@@ -1,0 +1,38 @@
+<?xml  version="1.0"?>
+<launch>
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+  <!-- "camera" should uniquely identify the device. All topics are pushed down
+       into the "camera" namespace, and it is prepended to tf frame ids. -->
+  <arg name="camera"      default="camera"/>
+
+  <arg name="device_1_prefix"   default="1"/>
+  <arg name="device_2_prefix"   default="2"/>
+  <!-- use ' rosservice call /camera/get_serial "{}" ' to get camera serial id -->
+  <!-- <arg name="device_1_id"   default="19111120242"/> -->
+  <!-- <arg name="device_2_id"   default="19111120261"/> -->
+  <arg name="device_1_id"   default="#1"/>
+  <arg name="device_2_id"   default="#2"/>
+
+  <param name="$(arg camera)_$(arg device_1_prefix)/driver/device_id"  type="str" value="$(arg device_1_id)" />
+  <rosparam file="$(find robot_settings)/cfg/yaml/$(arg camera)_$(arg device_1_prefix).yaml" command="load" ns="$(arg camera)_$(arg device_1_prefix)/driver"/>
+
+  <include file="$(find robot_settings)/launch/include/astra_1.launch">
+    <arg name="camera"                          value="$(arg camera)_$(arg device_1_prefix)"/>
+    <!--arg name="device_id"                       value="$(arg device_1_id)"/-->
+    <arg name="bootorder"                       value="1"/>
+    <arg name="devnums"                       value="2"/>
+  </include>
+
+  <param name="$(arg camera)_$(arg device_2_prefix)/driver/device_id"  type="str" value="$(arg device_2_id)" />
+  <rosparam file="$(find robot_settings)/cfg/yaml/$(arg camera)_$(arg device_2_prefix).yaml" command="load" ns="$(arg camera)_$(arg device_2_prefix)/driver"/>
+
+  <include file="$(find robot_settings)/launch/include/astra_1.launch">
+    <arg name="camera"                          value="$(arg camera)_$(arg device_2_prefix)"/>
+    <!--arg name="device_id"                       value="$(arg device_2_id)"/-->
+    <arg name="bootorder"                       value="2"/>
+    <arg name="devnums"                       value="2"/>
+  </include>
+
+</launch>

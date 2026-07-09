@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="ROBOT_TYPE" default="peanut"/>
+
+    <node pkg="tf2_web_republisher" type="tf2_web_republisher" name="tf2_web_republisher" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+    </node>
+
+</launch>

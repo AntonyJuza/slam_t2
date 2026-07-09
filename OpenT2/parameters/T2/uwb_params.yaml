@@ -1,0 +1,12 @@
+hostname: 172.16.1.33
+port: 9000
+global_location: false
+use_uwb: false
+initial_pose_x: -7.0
+initial_pose_y: -3.5
+convergent_threshold_x: 0.01
+convergent_threshold_y: 0.01
+convergent_threshold_th: 0.017
+angle_increment: 0.1
+fixed_angle: false
+is_dynamic_initial_positioning: false

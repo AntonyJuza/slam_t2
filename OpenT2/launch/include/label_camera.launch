@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="OUTPUT_METHOD" default="screen"/>
+  <arg name="RESPAWN" default="false"/>
+  <arg name="ROBOT_TYPE" default="peanut"/>
+  <node pkg="label_camera" name="label_camera_node" type="label_camera_node" output="$(arg OUTPUT_METHOD)" respawn="$(arg RESPAWN)">
+  </node>
+</launch>

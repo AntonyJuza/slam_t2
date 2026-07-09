@@ -1,5 +1,12 @@
 # Move Base Node (`move_base`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/move_base` (PID 34393). Active subscriptions to sensor inputs (`/scan`, `/planner_scan`, `/camera_1/depth/points`, `/camera_2/depth/points`, `/bump`), layers (`/map`, `/virtual_wall`, `/elevator_map`, `/vel_map`, `/gate_map`), control (`/move_base/goal`, `/move_base/cancel`), and output `/cmd_vel` confirmed via `rosnode info`. Timed Elastic Band local planner parameters loaded. |
+| **🟡 Inferred** | `kplanner/KPlannerROS` global path planning behavior and restricted speed zone costmap triggers (inferred from parameters and node connections, but not tested in all edge cases). |
+| **🔴 Unknown** | Exact elevator safety obstacle verification logic and human leg cluster tracking algorithms. |
+
 ## Purpose
 The `move_base` node manages path planning, obstacle avoidance, costmap maintenance, and velocity command generation. It hosts a global planner to generate paths to waypoints and a local planner to handle dynamic obstacle avoidance, guide the robot through narrow spaces (such as elevators), and control speed zones.
 

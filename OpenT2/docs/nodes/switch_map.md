@@ -1,5 +1,12 @@
 # Switch Map Node (`switch_map`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/switch_map` (PID 3624). Subscriptions to `/tf` and `/tf_static` and publications on `/map`, `/virtual_wall`, `/gate_map`, `/elevator_map`, `/vel_map`, `/map_metadata`, `/robot_current_floor`, and `/label_map` confirmed via `rosnode info`. SQLite map BLOB and waypoint retrieval from `peanut.db` verified. |
+| **🟡 Inferred** | Dynamic coordination rules during elevator docking and floor map coordinate transformation offsets (inferred from `/switch_dest_floor_map` service call sequence). |
+| **🔴 Unknown** | Exact validation check steps executed when writing updated layout layers back to the SQLite file. |
+
 ## Purpose
 The `switch_map` node manages multi-floor operations and map layer distribution. It queries the local SQLite database (`peanut.db`), extracts the correct map and layer data (such as occupancy grids, virtual walls, elevator zones, speed limit zones, and automatic gate locations) for the requested floor, and publishes them to the respective ROS topics.
 

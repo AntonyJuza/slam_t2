@@ -1,5 +1,12 @@
 # Cartographer Node (`cartographer_node`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/cartographer_node` (PID 2886) and `/cartographer_occupancy_grid_node`. Idle state subscriptions to `/run_mapping` and `/save_new_map` confirmed via `rosnode info`. Configuration Lua parameter values dumped. |
+| **🟡 Inferred** | Dynamic subscriptions to `/scan_front_orig`, `/scan_back_orig`, `/odom_combined`, `/tf` and dynamic broadcasting of `map` -> `odom` TF transform (inferred from `cartographer.launch` remappings and Cartographer architecture; active only when mapping is running). |
+| **🔴 Unknown** | Exact mechanism of saving the pbstream binary and pushing it to the SQLite database `peanut.db`. |
+
 ## Purpose
 The `cartographer_node` provides 2D SLAM (Simultaneous Localization and Mapping) back-end services. It constructs planar submaps by registering laser range scans and wheel odometry, performs loop closure optimization, and exports map trajectory databases (in `.pbstream` format) that are subsequently stored in the SQLite system database.
 
@@ -67,12 +74,12 @@ Key configurations extracted from `keenon_T2.lua`:
 
 | Topic | Type | Description |
 | :--- | :--- | :--- |
-| `/scan_front_orig` | `sensor_msgs/LaserScan` | Remapped to `scan_1` (front lidar scanner). |
-| `/scan_back_orig` | `sensor_msgs/LaserScan` | Remapped to `scan_2` (rear lidar scanner). |
-| `/odom_combined` | `geometry_msgs/PoseWithCovarianceStamped` | Remapped to `odom` (fused wheel odometry). |
-| `/run_mapping` | `std_msgs/UInt8` | Triggers cartographer to start or stop mapping. |
-| `/save_new_map` | StdSrvs/Empty style | Topic command to trigger serialization of the active map. |
-| `/tf` & `/tf_static` | `tf2_msgs/TFMessage` | Frame transforms. |
+| `/scan_front_orig` | `sensor_msgs/LaserScan` | **[Dynamic - Active Mapping Only]** Remapped to `scan_1` (front lidar scanner). |
+| `/scan_back_orig` | `sensor_msgs/LaserScan` | **[Dynamic - Active Mapping Only]** Remapped to `scan_2` (rear lidar scanner). |
+| `/odom_combined` | `geometry_msgs/PoseWithCovarianceStamped` | **[Dynamic - Active Mapping Only]** Remapped to `odom` (fused wheel odometry). |
+| `/run_mapping` | `std_msgs/UInt8` | **[Static]** Triggers cartographer to start or stop mapping. |
+| `/save_new_map` | StdSrvs/Empty style | **[Static]** Topic command to trigger serialization of the active map. |
+| `/tf` & `/tf_static` | `tf2_msgs/TFMessage` | **[Dynamic - Active Mapping Only]** Frame transforms. |
 
 ---
 

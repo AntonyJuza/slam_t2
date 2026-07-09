@@ -1,5 +1,12 @@
 # Peanut Localization Node (`peanut_localization_node`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/peanut_localization_node` (PID 2978). Subscriptions to `/elev_pos_state`, `/scan_orig`, `/charge_state_fromSTM32`, `/run_mapping`, `/elev_process_signal`, `/tf`, `/tf_static`, `/map` (published by `/switch_map`), and `/initialpose` confirmed via `rosnode info`. Dynamic broadcasting of the `map` -> `odom` coordinate transform at $\approx 50\text{ Hz}$. Config load from YAML. |
+| **🟡 Inferred** | Sub-centimeter alignment behavior during charging dock positioning and ICP convergence tolerances (inferred from parameter YAML files and database init_pose fields). |
+| **🔴 Unknown** | Exact math behind the dual-rate matcher recovery trigger limits and transition logic. |
+
 ## Purpose
 The `peanut_localization_node` is the primary localization engine of the robot during active deliveries. It subscribes to the merged raw laser scans (`/scan_orig`) and aligns them against the static grid map using a modular, high-precision 2D Iterative Closest Point (ICP) scan matcher, broadcasting the dynamic `map` -> `odom` coordinate transform.
 

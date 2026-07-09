@@ -1,5 +1,12 @@
 # Web Backend Node (`web_backend_node`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/web_backend_node` (PID 2866). Subscriptions to `/scan`, `/move_base/local_costmap/costmap`, `/gate_map`, `/mapping_status`, `/move_base/local_costmap/costmap_updates`, `/tf`, `/tf_static`, `/move_base/global_costmap/costmap`, `/map`, and `/virtual_wall` confirmed via `rosnode info`. Compressed image output streams and custom telemetry topic `/robot_state` active. |
+| **🟡 Inferred** | Android RPC web command protocol and JSON message layout (inferred from node connections and database schema references, but not reverse-engineered from tablet binary). |
+| **🔴 Unknown** | Cloud synchronization security tokens and WebSocket reconnection handshakes. |
+
 ## Purpose
 The `web_backend_node` acts as a communication bridge between the ROS environment and external user interfaces (such as the Android tablet app and cloud services). It monitors robot telemetry and compresses high-bandwidth grid maps and costmaps into compressed image streams to save wireless bandwidth.
 

@@ -1,5 +1,12 @@
 # Chassis Node (`chassis`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/chassis` (PID 2871), serial port mapping `/dev/ttyUSBStm32` (symlink to `/dev/ttyUSB2`), baudrate 115200, output topics `/encoder_raw`, `/chassis_imu_data` (dummy), `/battery_state`, `/motor_lock_status`, `/urgency_stop`, `/urgency_button_status`, `/charge_state_fromSTM32`. |
+| **🟡 Inferred** | Custom message payload structures for `keenon_charge_msgs`, `keenon_motor_msgs`, and exact behavior of firmware upgrading via `/stm32_down` and `/stm32_up` (derived from configuration parameters and binary dependencies). |
+| **🔴 Unknown** | Exact serial transmission commands for custom calibration procedures and factory setup registers. |
+
 ## Purpose
 The `chassis` node acts as the hardware abstraction layer and interface to the physical robot chassis. It handles bidirectional communication with the STM32 board to control the wheel motors, read encoders, retrieve IMU measurements, report safety sensors (bumpers, infrared beams), monitor battery/power state, and control automatic charging.
 

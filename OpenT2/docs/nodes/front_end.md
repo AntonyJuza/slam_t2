@@ -1,5 +1,12 @@
 # Front End Node (`front_end_node`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/front_end_node` (PID 2878). Subscriptions to `/chassis_imu_data`, `/encoder_raw`, `/tf`, `/tf_static`, and `/laser_odom` (published by `/srf_node`). Dynamic broadcasting of the `odom` -> `base_link` transform at $\approx 50\text{ Hz}$. Config load from YAML. |
+| **🟡 Inferred** | Extended Kalman Filter covariance matrices and noise model scaling (inferred from launch configurations and EKF structure). |
+| **🔴 Unknown** | Exact internal calibration offsets applied to encoder ticks prior to EKF ingestion. |
+
 ## Purpose
 The `front_end_node` acts as the primary sensor fusion and odometry estimator. It fuses high-frequency encoder counts, raw IMU accelerometer/gyroscope signals, and planar scan matcher odometry (`/laser_odom`) using an Extended Kalman Filter (EKF) to broadcast the dynamic `odom` -> `base_link` coordinate frame transform.
 

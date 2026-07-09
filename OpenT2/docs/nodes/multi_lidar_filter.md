@@ -1,5 +1,12 @@
 # Multi Lidar Filter Node (`multi_lidar_filter`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running nodes `/multi_lidar_filter` and `/multi_lidar_filter_for_planner`. Subscriptions to `/scan_front_orig`, `/scan_back_orig`, `/tf`. Publications on `/scan_orig`, `/scan`, `/planner_scan` at $28\text{ Hz}$. Config load from YAML parameters. |
+| **🟡 Inferred** | Exact geometric cluster separation algorithms (derived from configuration thresholds `search_th` and `th_thre` but not reverse-engineered from source binaries). |
+| **🔴 Unknown** | Exact scan matching/alignment math used internally inside the filter executable. |
+
 ## Purpose
 The `multi_lidar_filter` node fuses two physical $180^\circ$ lidars (front and rear SDKeli scanners) into a single $360^\circ$ representation, removes self-reflections caused by the robot chassis footprint, and outputs clean laser scan streams for obstacle avoidance, global planning, and localization.
 

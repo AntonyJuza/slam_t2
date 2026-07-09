@@ -1,5 +1,12 @@
 # Schedule Map Builder Node (`schedule_map_builder`)
 
+## Verification Status
+| Status | Items |
+| :--- | :--- |
+| **✅ Verified** | Running node `/schedule_map_builder` (PID 3679). Subscriptions to `/tf`, `/tf_static`, and `/robot_current_floor` (published by `/switch_map`), and publications on `/virtual_wall_1`, `/schedule_state`, `/virtual_wall_updates`, and `/click_map_pub_` confirmed via `rosnode info`. |
+| **🟡 Inferred** | Multi-robot dynamic blocking zone and hallway lock mechanics (inferred from node connections and `/virtual_wall_updates` topic, but not validated with multiple active robots). |
+| **🔴 Unknown** | Exact network synchronization API and server-side scheduler dispatch communication parameters. |
+
 ## Purpose
 The `schedule_map_builder` node handles multi-robot coordination and scheduling. It communicates with the scheduling server, coordinates virtual wall blockages, publishes scheduling state, and updates costmaps dynamically to prevent the robot from planning routes through restricted or busy hallways.
 

@@ -3,6 +3,12 @@
 > [!NOTE]
 > This document has been compiled via clean-room reverse engineering of the Keenon T2 delivery robot system. It serves as a hardware and software reference for developers aiming to deploy open-source software on this platform without relying on proprietary Keenon binaries.
 
+### Information Classification & Confidence Levels
+To prevent relying on unverified assumptions, specifications in this documentation are classified under three levels:
+* **✅ Verified**: Information directly confirmed on the running robot (e.g., active topics, active services, queryable nodes, device files, database schema extraction, physical link offset dimensions).
+* **🟡 Inferred**: Derived from configuration templates, launch files, parameter YAMLs, and binary dependency files (e.g., dynamic mapping-only topic subscriptions, expected planner behaviors).
+* **🔴 Unknown / Unconfirmed**: Elements not yet verified or reverse-engineered (e.g., Android RPC messages, cloud sync tokens, specific map serialization calls).
+
 ---
 
 ## 1. System Architecture Overview

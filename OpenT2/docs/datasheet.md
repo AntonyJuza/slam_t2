@@ -17,6 +17,112 @@ The Keenon T2 delivery robot is built on a differential-drive mobile base contai
 
 The onboard computing unit runs Ubuntu 14.04 (Trusty Tahr) with ROS Indigo. The system uses a centralized local SQLite 3 database to store maps, waypoints, elevator alignment matrices, speed profiles, and hardware variables.
 
+### System Data Flow Architecture
+
+#### Textual Topology Overview
+
+```
+                 +------------------+
+                 |  Android Tablet  |
+                 +---------+--------+
+                           |
+                    /web_command
+                           |
+                  /web_backend_node
+                           |
+      +--------------------+-------------------+
+      |                                        |
+ /switch_map                              /cartographer_node
+      |                                        |
+      |                                 operate_pbstream
+      |                                        |
+      +------------- peanut.db ----------------+
+                     |
+                    /map
+                     |
+           /peanut_localization_node
+                     | (ICP scan match)
+                 map -> odom (TF)
+                     |
+              /front_end_node (EKF)
+                     |
+               odom -> base_link (TF)
+                     |
+            /multi_lidar_filter <--- /srf_node (/laser_odom)
+            /        |        \
+    Front LiDAR  Rear LiDAR  Planner Scan
+            \        |        /
+                /move_base
+                     |
+                  /cmd_vel
+                     |
+                  /chassis
+                     | (USART Serial)
+                   STM32
+```
+
+#### Detailed Topic & Transformation Graph (Mermaid)
+
+```mermaid
+graph TD
+    %% Style definitions
+    classDef verified fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:#fff;
+    classDef hardware fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff;
+    
+    Tablet["Android Tablet (UI)"]
+    WebBackend["/web_backend_node"]:::verified
+    SwitchMap["/switch_map"]:::verified
+    Cartographer["/cartographer_node"]:::verified
+    PeanutDB[("SQLite Database<br>(peanut.db)")]:::verified
+    PeanutLoc["/peanut_localization_node"]:::verified
+    FrontEnd["/front_end_node"]:::verified
+    SrfNode["/srf_node"]:::verified
+    MultiLidar["/multi_lidar_filter"]:::verified
+    LidarPlanner["/multi_lidar_filter_for_planner"]:::verified
+    MoveBase["/move_base"]:::verified
+    Chassis["/chassis"]:::verified
+    STM32["STM32 Motion Board"]:::hardware
+    LidarF["Front LiDAR (/sdkeli_front)"]:::hardware
+    LidarR["Rear LiDAR (/sdkeli_back)"]:::hardware
+    Cam1["Front Depth Cam"]:::hardware
+    Cam2["Rear Depth Cam"]:::hardware
+    
+    %% Flows
+    Tablet -- "/web_command (JSON RPC)" --> WebBackend
+    WebBackend -- "/switch_dest_floor_map" --> SwitchMap
+    WebBackend -- "/run_mapping" --> Cartographer
+    Cartographer -- "save map / pbstream" --> PeanutDB
+    SwitchMap -- "read floors / layers" --> PeanutDB
+    
+    SwitchMap -- "/map" --> PeanutLoc
+    SwitchMap -- "/map, /virtual_wall, /gate_map, /vel_map" --> MoveBase
+    
+    LidarF -- "/scan_front_orig" --> MultiLidar
+    LidarR -- "/scan_back_orig" --> MultiLidar
+    LidarF -- "/scan_front_orig" --> LidarPlanner
+    LidarR -- "/scan_back_orig" --> LidarPlanner
+    
+    MultiLidar -- "/scan_orig" --> SrfNode
+    MultiLidar -- "/scan" --> MoveBase
+    LidarPlanner -- "/planner_scan" --> MoveBase
+    
+    SrfNode -- "/laser_odom" --> FrontEnd
+    Chassis -- "/encoder_raw" --> FrontEnd
+    Chassis -- "/chassis_imu_data (dummy)" --> FrontEnd
+    
+    FrontEnd -- "odom -> base_link (TF)" --> PeanutLoc
+    FrontEnd -- "odom -> base_link (TF)" --> MoveBase
+    
+    PeanutLoc -- "map -> odom (TF)" --> MoveBase
+    PeanutLoc -- "/localization/robot_pose" --> MoveBase
+    
+    Cam1 -- "/camera_1/depth/points" --> MoveBase
+    Cam2 -- "/camera_2/depth/points" --> MoveBase
+    
+    MoveBase -- "/cmd_vel" --> Chassis
+    Chassis -- "USART serial" --> STM32
+```
+
 ---
 
 ## 2. Task 1: Hardware Inventory & Specifications

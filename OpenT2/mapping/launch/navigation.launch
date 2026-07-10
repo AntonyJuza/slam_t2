@@ -31,11 +31,12 @@
   <!-- 6. Start AMCL Localization -->
   <node pkg="amcl" type="amcl" name="amcl" output="screen">
     <rosparam file="$(find open_t2_mapping)/config/navigation/amcl_params.yaml" command="load"/>
-    <remap from="scan" to="scan" />
+    <remap from="scan" to="scan_filtered" />
   </node>
 
   <!-- 7. Start Move Base Navigation -->
   <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <remap from="odom" to="odom_combined" />
     <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
     <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
     <rosparam file="$(find open_t2_mapping)/config/navigation/move_base_params.yaml" command="load"/>

@@ -10,7 +10,7 @@ global_costmap:
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
 
   static_layer:
-    enabled:              false
+    enabled:              true
     map_topic:            /map
 
   obstacle_layer:

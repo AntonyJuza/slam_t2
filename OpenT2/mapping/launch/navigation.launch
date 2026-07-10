@@ -1,0 +1,50 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="robot_type" default="T2" />
+  <arg name="map_file" default="/home/peanut/map.yaml" />
+
+  <!-- 1. Start Keenon Chassis (Odometry) and Robot State Publisher (URDF/Static TFs) -->
+  <include file="$(find robot_settings)/launch/include/chassis.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+  <include file="$(find robot_settings)/launch/include/robot_state_publisher.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+
+  <!-- 2. Start SDKELI LiDAR Sensors -->
+  <include file="$(find robot_settings)/launch/include/keli_2.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+
+  <!-- 3. Start LiDAR Filters -->
+  <include file="$(find robot_settings)/launch/include/lidar_filter_2.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+
+  <!-- 4. Start Robot Location (Front End Node) for odom -> base_link TF -->
+  <include file="$(find robot_settings)/launch/include/robot_location.launch">
+  </include>
+
+  <!-- 5. Start Map Server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen" />
+
+  <!-- 6. Start AMCL Localization -->
+  <node pkg="amcl" type="amcl" name="amcl" output="screen">
+    <rosparam file="$(find open_t2_mapping)/config/navigation/amcl_params.yaml" command="load"/>
+    <remap from="scan" to="scan" />
+  </node>
+
+  <!-- 7. Start Move Base Navigation -->
+  <node pkg="move_base" type="move_base" name="move_base" output="screen">
+    <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
+    <rosparam file="$(find open_t2_mapping)/config/navigation/move_base_params.yaml" command="load"/>
+    <rosparam file="$(find open_t2_mapping)/config/navigation/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find open_t2_mapping)/config/navigation/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find open_t2_mapping)/config/navigation/costmap_common_params.yaml" command="load" ns="function_costmap" />
+    <rosparam file="$(find open_t2_mapping)/config/navigation/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find open_t2_mapping)/config/navigation/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find open_t2_mapping)/config/navigation/function_costmap_params.yaml" command="load" />
+    <rosparam file="$(find open_t2_mapping)/config/navigation/teb_local_planner_params.yaml" command="load" />
+  </node>
+</launch>

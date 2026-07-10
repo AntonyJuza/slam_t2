@@ -26,39 +26,54 @@ The onboard computing unit runs Ubuntu 14.04 (Trusty Tahr) with ROS Indigo. The 
                  |  Android Tablet  |
                  +---------+--------+
                            |
-                    /web_command
+                    /web_command (service)
                            |
                   /web_backend_node
-                           |
-      +--------------------+-------------------+
-      |                                        |
- /switch_map                              /cartographer_node
-      |                                        |
-      |                                 operate_pbstream
-      |                                        |
-      +------------- peanut.db ----------------+
-                     |
-                    /map
-                     |
-           /peanut_localization_node
-                     | (ICP scan match)
-                 map -> odom (TF)
-                     |
-              /front_end_node (EKF)
-                     |
-               odom -> base_link (TF)
-                     |
-            /multi_lidar_filter <--- /srf_node (/laser_odom)
-            /        |        \
-    Front LiDAR  Rear LiDAR  Planner Scan
-            \        |        /
-                /move_base
-                     |
-                  /cmd_vel
-                     |
-                  /chassis
-                     | (USART Serial)
-                   STM32
+                     |          |
+          /run_mapping|          |/mapping_status
+            (pub)     |          |(sub)
+                      v          |
+                /cartographer_node ----+
+                      |                |
+          /operate_pbstream (svc)      |
+                      |                |
+               /web_backend_node       |
+                      |                |
+          /database/config_map (svc)   |
+                      |                |
+                  /database -----------+
+                      |
+                  peanut.db (filesystem)
+                      |
+        +-------------+-------------+
+        |                           |
+   /switch_map             (direct file read)
+        |
+       /map (topic)
+        |
+   /peanut_localization_node
+        | (ICP scan match)
+    map -> odom (TF)
+        |
+   /front_end_node (EKF)
+        |
+   odom -> base_link (TF)
+        |                          /robot_state_publisher
+        |                            (static TFs from URDF)
+   /multi_lidar_filter <--- /srf_node (/laser_odom)
+   /        |        \
+ Front    Rear     Planner
+ LiDAR    LiDAR    Scan
+   \        |        /
+       /move_base
+            |
+         /cmd_vel
+            |
+    /chassis -----> /odom_combined (topic)
+            |
+      (USART Serial)
+            |
+          STM32
 ```
 
 #### Detailed Topic & Transformation Graph (Mermaid)
@@ -68,12 +83,14 @@ graph TD
     %% Style definitions
     classDef verified fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:#fff;
     classDef hardware fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff;
-    
+    classDef database fill:#e67e22,stroke:#d35400,stroke-width:2px,color:#fff;
+
     Tablet["Android Tablet (UI)"]
     WebBackend["/web_backend_node"]:::verified
     SwitchMap["/switch_map"]:::verified
     Cartographer["/cartographer_node"]:::verified
-    PeanutDB[("SQLite Database<br>(peanut.db)")]:::verified
+    Database["/database"]:::verified
+    PeanutDB[("peanut.db (filesystem)")]:::database
     PeanutLoc["/peanut_localization_node"]:::verified
     FrontEnd["/front_end_node"]:::verified
     SrfNode["/srf_node"]:::verified
@@ -81,44 +98,66 @@ graph TD
     LidarPlanner["/multi_lidar_filter_for_planner"]:::verified
     MoveBase["/move_base"]:::verified
     Chassis["/chassis"]:::verified
+    RobotStatePub["/robot_state_publisher"]:::verified
     STM32["STM32 Motion Board"]:::hardware
     LidarF["Front LiDAR (/sdkeli_front)"]:::hardware
     LidarR["Rear LiDAR (/sdkeli_back)"]:::hardware
     Cam1["Front Depth Cam"]:::hardware
     Cam2["Rear Depth Cam"]:::hardware
-    
-    %% Flows
+
+    %% Tablet to Web Backend
     Tablet -- "/web_command (JSON RPC)" --> WebBackend
-    WebBackend -- "/switch_dest_floor_map" --> SwitchMap
-    WebBackend -- "/run_mapping" --> Cartographer
-    Cartographer -- "save map / pbstream" --> PeanutDB
-    SwitchMap -- "read floors / layers" --> PeanutDB
-    
+
+    %% Web Backend control outputs
+    WebBackend -- "/run_mapping (pub)" --> Cartographer
+    Cartographer -- "/mapping_status (pub)" --> WebBackend
+    WebBackend -- "/switch_dest_floor_map (svc call)" --> SwitchMap
+
+    %% Map save flow: WebBackend orchestrates
+    WebBackend -. "/operate_pbstream (svc call)" .-> Cartographer
+    WebBackend -. "/database/config_map (svc call)" .-> Database
+    Database -- "read/write" --> PeanutDB
+    SwitchMap -. "direct file read" .-> PeanutDB
+
+    %% Map distribution
     SwitchMap -- "/map" --> PeanutLoc
-    SwitchMap -- "/map, /virtual_wall, /gate_map, /vel_map" --> MoveBase
-    
+    SwitchMap -- "/map" --> WebBackend
+    SwitchMap -- "/virtual_wall, /gate_map" --> WebBackend
+    SwitchMap -- "/map, /virtual_wall, /gate_map, /vel_map, /elevator_map" --> MoveBase
+
+    %% Web Backend UI subscriptions
+    MultiLidar -- "/scan" --> WebBackend
+    MoveBase -- "costmap topics" --> WebBackend
+
+    %% LiDAR sensor flows
     LidarF -- "/scan_front_orig" --> MultiLidar
     LidarR -- "/scan_back_orig" --> MultiLidar
     LidarF -- "/scan_front_orig" --> LidarPlanner
     LidarR -- "/scan_back_orig" --> LidarPlanner
-    
+
+    %% Scan processing
     MultiLidar -- "/scan_orig" --> SrfNode
     MultiLidar -- "/scan" --> MoveBase
     LidarPlanner -- "/planner_scan" --> MoveBase
-    
+
+    %% Odometry & sensor fusion
     SrfNode -- "/laser_odom" --> FrontEnd
     Chassis -- "/encoder_raw" --> FrontEnd
     Chassis -- "/chassis_imu_data (dummy)" --> FrontEnd
-    
-    FrontEnd -- "odom -> base_link (TF)" --> PeanutLoc
-    FrontEnd -- "odom -> base_link (TF)" --> MoveBase
-    
-    PeanutLoc -- "map -> odom (TF)" --> MoveBase
+    Chassis -- "/odom_combined (topic)" --> Cartographer
+
+    %% TF chain
+    RobotStatePub -- "static TFs (URDF)" --> FrontEnd
+    FrontEnd -- "odom to base_link (TF)" --> PeanutLoc
+    FrontEnd -- "odom to base_link (TF)" --> MoveBase
+    PeanutLoc -- "map to odom (TF)" --> MoveBase
     PeanutLoc -- "/localization/robot_pose" --> MoveBase
-    
+
+    %% Depth cameras
     Cam1 -- "/camera_1/depth/points" --> MoveBase
     Cam2 -- "/camera_2/depth/points" --> MoveBase
-    
+
+    %% Motor command chain
     MoveBase -- "/cmd_vel" --> Chassis
     Chassis -- "USART serial" --> STM32
 ```
@@ -272,3 +311,64 @@ Waypoints representing tables, chargers, and elevators.
 ### 4. `elevator` & `gate` (Smart Environment Interfaces)
 * **`elevator`:** Stores transit floor indices and door open timeouts (`opendoor_time`).
 * **`gate`:** Stores automatic door configuration mapped to hardware MAC addresses (`mac_address`) to trigger wireless opening commands during navigation.
+
+---
+
+## 8. Reverse Engineering Insights: Mapping Control & SQL Persistence
+
+### 1. Mapping Control & Startup Flow (✅ Verified)
+* **Start Command**: Mapping is initiated when the robot receives a WebSocket / JSON-RPC request from the Android tablet. The `web_backend_node` translates this request into a message of type `std_msgs/UInt8` and publishes it to the `/run_mapping` topic.
+* **Mode Toggles**: The `/run_mapping` topic uses the values defined in `web_backend/msg/robot_state.msg`:
+  * `0`: `NAVIGATION` (Idle / Pose Tracking)
+  * `1`: `GMAPPING` (Alternative SLAM, unused)
+  * `2`: `CARTOGRAPHER` (Cartographer SLAM mapping)
+  * `3`: `EXPANSION` (Map expansion mode)
+* **Dynamic Topic Subscriptions**: When `/run_mapping` transitions to `2` (CARTOGRAPHER) or `3` (EXPANSION), the `/cartographer_node` dynamically creates a trajectory. It begins subscribing to `/scan_front_orig`, `/scan_back_orig`, and `/odom_combined`, and publishes the `/submap_list` topic. In idle or navigation mode, these subscriptions are destroyed, and `/submap_list` does not publish.
+
+### 2. Map Persistence & SQLite Storage
+* **`/operate_pbstream` service** (✅ Verified): Hosted by `/cartographer_node`, type `keenon_database_msgs/pbstreamConfig`. Used to trigger pbstream serialization.
+* **`/database` node services** (✅ Verified via `rosnode info /database`):
+  * `/database/config_map` (type `keenon_database_msgs/mapConfig`) — Write/read map grid BLOBs.
+  * `/database/config_pose` — Write/read waypoints.
+  * `/database/config_init_pose` — Write/read initial localization poses.
+  * `/database/config_elevator` — Elevator configuration.
+  * `/database/config_gate` — Gate/door configuration.
+  * `/database/config_label` — Label configuration.
+  * `/database/config_maptrans` — Map transformation data.
+  * `/database/manager` — Database management.
+  * **Note:** There is **no** `/database/config_pbstream` service.
+* **Map save orchestration** (🟡 Inferred from binary strings and service topology): When mapping is stopped, `/web_backend_node` likely calls `/operate_pbstream` on `/cartographer_node` to serialize the trajectory, then calls `/database/config_map` on `/database` to persist the occupancy grid BLOB into `peanut.db`.
+
+### 3. Root Cause of "Scan Complete" Hang (🟡 Inferred)
+* **Observation**: The `/cartographer_node` binary contains hardcoded string references to `config_pbstream` and `pbstreamConfig`, suggesting it attempts to call a pbstream persistence service.
+* **Verified fact**: The `/database` node does **not** advertise any service named `/database/config_pbstream` (confirmed via `rosnode info /database`).
+* **Hypothesis**: When `/cartographer_node` tries to call this missing service synchronously during the map-save finalization, the ROS service client blocks indefinitely, causing the "Scan Complete" UI to hang. This has not been directly triggered and observed, so it remains an inference.
+
+### 4. Upstream Cartographer Compatibility (✅ Verified)
+* Upstream, standard Cartographer (`cartographer_node` from `cartographer_ros` package) is fully compatible with the robot's sensor topics:
+  * `/scan_front_orig` and `/scan_back_orig` supply raw planar scans.
+  * `/odom_combined` supplies wheel-odometry.
+  * `/tf` and `/tf_static` provide the necessary coordinate transforms.
+* A standard configuration with 2 laser scans and 1 odometry input can directly consume these topics, bypassing all proprietary Keenon nodes.
+
+---
+
+## 9. OpenT2 Core Packages: Phase 1 (✅ Verified)
+
+To systematically replace Keenon's proprietary SLAM stack, we have created the first **OpenT2** package: `open_t2_mapping`.
+
+### Package Architecture
+Located at `OpenT2/mapping/`, it runs a standard upstream Cartographer setup configured with the robot's specific physical geometry and LiDAR frames:
+
+* **`package.xml`**: Defines standard dependencies (`cartographer_ros`, `sensor_msgs`, etc.).
+* **`CMakeLists.txt`**: Standard Catkin build script.
+* **`config/`**: Contains fully tuned, self-contained Cartographer parameters (`keenon_T2.lua` and its included files like `map_builder.lua`, `trajectory_builder.lua`, and `pose_graph.lua`).
+* **`launch/mapping.launch`**: Launches:
+  1. Keenon `chassis` (to read encoders and broadcast wheel odometry on `/odom_combined`).
+  2. Keenon `robot_state_publisher` (to publish static TF transforms for the front and rear LiDAR links).
+  3. SDKELI drivers (`/sdkeli_front`, `/sdkeli_back`).
+  4. Dual LiDAR filters (`multi_lidar_filter`).
+  5. Standard `cartographer_node` (configured to consume `/scan_front_orig`, `/scan_back_orig`, and `/odom_combined`).
+  6. Standard `cartographer_occupancy_grid_node` to build `/map`.
+  7. RViz visualization (`mapping.rviz`) for live map monitoring.
+

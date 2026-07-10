@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>open_t2_mapping</name>
+  <version>1.0.0</version>
+  <description>OpenT2 Mapping Package for Keenon T2 using Cartographer</description>
+  <maintainer email="open-t2@example.com">OpenT2 Developer</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>cartographer_ros</depend>
+</package>

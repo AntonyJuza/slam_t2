@@ -1,0 +1,47 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="robot_type" default="T2" />
+  <arg name="configuration_basename" default="keenon_T2.lua" />
+
+  <!-- 1. Start Keenon Chassis (Odometry) and Robot State Publisher (URDF/Static TFs) -->
+  <include file="$(find robot_settings)/launch/include/chassis.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+  <include file="$(find robot_settings)/launch/include/robot_state_publisher.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+
+  <!-- 2. Start SDKELI LiDAR Sensors -->
+  <include file="$(find robot_settings)/launch/include/keli_2.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+
+  <!-- 3. Start LiDAR Filters -->
+  <include file="$(find robot_settings)/launch/include/lidar_filter_2.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+
+  <!-- 4. Start Upstream/Standard Cartographer Node -->
+  <!-- Remap standard Cartographer multi-LiDAR scans to the robot's hardware scan topics -->
+  <node name="cartographer_node" pkg="cartographer_ros"
+        type="cartographer_node" args="
+            -configuration_directory $(find open_t2_mapping)/config
+            -configuration_basename $(arg configuration_basename)"
+        output="screen">
+    <remap from="scan_1" to="scan_front_orig" />
+    <remap from="scan_2" to="scan_back_orig" />
+    <remap from="odom" to="odom_combined" />
+  </node>
+
+  <!-- 5. Start Cartographer Occupancy Grid Node to publish /map -->
+  <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
+        type="cartographer_occupancy_grid_node" args="-resolution 0.05"
+        output="screen">
+  </node>
+
+  <arg name="use_rviz" default="false" />
+
+  <!-- 6. Start RViz for visualization -->
+  <node name="rviz" pkg="rviz" type="rviz" required="true"
+        args="-d $(find open_t2_mapping)/rviz/mapping.rviz" if="$(arg use_rviz)" />
+</launch>

@@ -23,9 +23,10 @@ TebLocalPlannerROS:
  # Robot
 
  max_vel_x: 1.0
+ min_vel_x: 0.1
  low_speed_vel_x: 0.5
  elev_mode_vel_x: 0.5
- max_vel_x_backwards: 0.0
+ max_vel_x_backwards: 0.2
  max_vel_theta: 0.6
  low_speed_vel_theta: 1.0
  acc_lim_x: 0.4
@@ -37,10 +38,10 @@ TebLocalPlannerROS:
  auto_velocity_obstacle_dist: 0.4
  auto_velocity_obstacle_orien: 1.05
  auto_velocity_min_vel_x: 0.3
- force_velocity_smooth: True
+ force_velocity_smooth: False
  control_delay_duration: 0.125
  control_time_lapse: 0.1
- useSpeedSmooth: True
+ useSpeedSmooth: False
  acc_theta_over_ratio_threshold: 1.5
  lim_linear_ratio: 0.6
  lim_all_pose_threshlod: 0.4
@@ -52,8 +53,8 @@ TebLocalPlannerROS:
 
  # GoalTolerance
 
- xy_goal_tolerance: 0.15
- yaw_goal_tolerance: 0.2
+ xy_goal_tolerance: 0.04
+ yaw_goal_tolerance: 0.05
  allow_goal_orientation_reverse: False
 
  # Obstacles

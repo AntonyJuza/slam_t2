@@ -11,8 +11,11 @@
     <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
 
-  <!-- 2. Start SDKELI LiDAR Sensors -->
+  <!-- 2. Start SDKELI LiDAR Sensors and Depth Cameras -->
   <include file="$(find robot_settings)/launch/include/keli_2.launch">
+    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
+  </include>
+  <include file="$(find robot_settings)/launch/include/astra_2.launch">
     <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
 

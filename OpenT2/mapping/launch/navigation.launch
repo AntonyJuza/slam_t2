@@ -19,10 +19,21 @@
     <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
 
-  <!-- 3. Start LiDAR Filters -->
-  <include file="$(find robot_settings)/launch/include/lidar_filter_2.launch">
-    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
-  </include>
+  <!-- 3. Start LiDAR Filters (Inlined to remap conflicting scan_orig topic) -->
+  <node name="multi_lidar_filter" pkg="lidar_filter" type="multi_lidar_filter" respawn="true" output="screen">
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg robot_type)/lidar_filter_params.yaml" command="load"/>
+    <remap from="scan_orig_1" to="scan_front_orig"/>
+    <remap from="scan_orig_2" to="scan_back_orig"/>
+    <remap from="scan_filtered" to="scan"/>
+  </node>
+
+  <node name="multi_lidar_filter_for_planner" pkg="lidar_filter" type="multi_lidar_filter" respawn="true" output="screen">
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg robot_type)/lidar_filter_for_planner_params.yaml" command="load"/>
+    <remap from="scan_orig_1" to="scan_front_orig"/>
+    <remap from="scan_orig_2" to="scan_back_orig"/>
+    <remap from="scan_filtered" to="planner_scan"/>
+    <remap from="scan_orig" to="scan_orig_planner"/>
+  </node>
 
   <!-- 4. Start Robot Location (Front End Node) for odom -> base_link TF -->
   <include file="$(find robot_settings)/launch/include/robot_location.launch">
@@ -32,13 +43,13 @@
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen" />
 
   <!-- 6. Start AMCL Localization -->
-  <node pkg="amcl" type="amcl" name="amcl" output="screen">
+  <node pkg="amcl" type="amcl" name="amcl" respawn="true" output="screen">
     <rosparam file="$(find open_t2_mapping)/config/navigation/amcl_params.yaml" command="load"/>
     <remap from="scan" to="scan_filtered" />
   </node>
 
   <!-- 7. Start Move Base Navigation -->
-  <node pkg="move_base" type="move_base" name="move_base" output="screen">
+  <node pkg="move_base" type="move_base" name="move_base" respawn="true" output="screen">
     <remap from="odom" to="odom_combined" />
     <param name="base_global_planner" value="global_planner/GlobalPlanner"/>
     <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>

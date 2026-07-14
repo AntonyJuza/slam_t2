@@ -14,10 +14,10 @@ global_costmap:
     map_topic:            /map
 
   obstacle_layer:
-    observation_sources: scan camera_1 camera_2 bump
+    observation_sources: scan camera_1 bump
     scan: {sensor_frame: laser_link, observation_persistence: 0.0, max_obstacle_height: 5.0, min_obstacle_height: 0.0, data_type: LaserScan, topic: /scan_filtered}
-    camera_1: {sensor_frame: camera_1_link, observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_1/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true, marking: true, clearing: true}
-    camera_2: {sensor_frame: camera_2_link, observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.333, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_2/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true, marking: true, clearing: true}
+    camera_1: {sensor_frame: camera_1_link, observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.46, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_1/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true, marking: true, clearing: true}
+    camera_2: {sensor_frame: camera_2_link, observation_persistence: 0.0, max_obstacle_height: 1.5, min_obstacle_height: 0.46, obstacle_range: 1.2, data_type: PointCloud2, topic: /camera_2/depth/points, expected_update_rate: 1.0, marking_allow_timeout: true, marking: true, clearing: true}
     bump: {sensor_frame: base_link, observation_persistence: 0.0, max_obstacle_height: 1.0, min_obstacle_height: 0.1, data_type: PointCloud2, topic: /bump, expected_update_rate: 1.0, marking_allow_timeout: true, marking: true, clearing: true}
     obstacle_glow: true
     glow_depth: 3

@@ -16,8 +16,24 @@
     <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
 
-  <!-- 3. Start LiDAR Filters -->
-  <include file="$(find robot_settings)/launch/include/lidar_filter_2.launch">
+  <!-- 3. Start LiDAR Filters (Inlined to remap conflicting scan_orig topic) -->
+  <node name="multi_lidar_filter" pkg="lidar_filter" type="multi_lidar_filter" respawn="true" output="screen">
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg robot_type)/lidar_filter_params.yaml" command="load"/>
+    <remap from="scan_orig_1" to="scan_front_orig"/>
+    <remap from="scan_orig_2" to="scan_back_orig"/>
+    <remap from="scan_filtered" to="scan"/>
+  </node>
+
+  <node name="multi_lidar_filter_for_planner" pkg="lidar_filter" type="multi_lidar_filter" respawn="true" output="screen">
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg robot_type)/lidar_filter_for_planner_params.yaml" command="load"/>
+    <remap from="scan_orig_1" to="scan_front_orig"/>
+    <remap from="scan_orig_2" to="scan_back_orig"/>
+    <remap from="scan_filtered" to="planner_scan"/>
+    <remap from="scan_orig" to="scan_orig_planner"/>
+  </node>
+
+  <!-- Start Robot Location (Front End Node) for odom -> base_link TF -->
+  <include file="$(find robot_settings)/launch/include/robot_location.launch">
     <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
 

@@ -34,7 +34,6 @@
 
   <!-- Start Robot Location (Front End Node) for odom -> base_link TF -->
   <include file="$(find robot_settings)/launch/include/robot_location.launch">
-    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
 
   <!-- 4. Start Upstream/Standard Cartographer Node -->

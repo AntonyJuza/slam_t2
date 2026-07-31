@@ -54,12 +54,9 @@ class KeenonT2ChassisDriver(Node):
         self.imu_frame = self.get_parameter('imu_frame').value
 
         # Open Serial Port
-        try:
-            self.ser = serial.Serial(self.port_name, self.baudrate, timeout=0.02)
-            self.get_logger().info(f"Connected to Keenon T2 STM32 chassis on {self.port_name} at {self.baudrate} baud.")
-        except Exception as e:
-            self.get_logger().error(f"Failed to open serial port {self.port_name}: {e}")
-            sys.exit(1)
+        self.get_logger().info(f"Opening serial port {self.port_name} at {self.baudrate} baud...")
+        self.ser = serial.Serial(self.port_name, self.baudrate, timeout=0.02)
+        self.get_logger().info(f"Successfully connected to Keenon T2 chassis!")
 
         # Publishers & Broadcasters
         self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
@@ -96,12 +93,9 @@ class KeenonT2ChassisDriver(Node):
 
     def send_motor_command(self, v_m_s: float, w_rad_s: float):
         """Packs motor velocity command into Keenon STM32 UART frame."""
-        # Convert m/s -> mm/s and rad/s -> mrad/s
         v_mm_s = int(v_m_s * 1000.0)
         w_mrad_s = int(w_rad_s * 1000.0)
 
-        # Keenon motor command packet format (CMD 0x20)
-        # Header: AA AA 00 E0 20 00 08 [v_mm_s int32_le] [w_mrad_s int32_le] [CRC16] 55 55
         payload = struct.pack('<ii', v_mm_s, w_mrad_s)
         cmd_id = 0x20
         seq = 0x00
@@ -109,7 +103,6 @@ class KeenonT2ChassisDriver(Node):
 
         header = bytes([0xAA, 0xAA, 0x00, 0xE0, cmd_id, seq, length])
         
-        # Simple additive checksum
         checksum_val = sum(header[2:]) + sum(payload)
         crc = struct.pack('<H', checksum_val & 0xFFFF)
 
@@ -159,7 +152,6 @@ class KeenonT2ChassisDriver(Node):
                     self.process_imu_frame(payload)
 
         # 3. Safety Watchdog & Send motor command
-        # If no cmd_vel received within 0.5s, command 0 velocity
         if time.time() - self.last_cmd_time > 0.5:
             self.target_linear_x = 0.0
             self.target_angular_z = 0.0
@@ -176,15 +168,16 @@ class KeenonT2ChassisDriver(Node):
                 d_left = left_ticks - self.prev_left_ticks
                 d_right = right_ticks - self.prev_right_ticks
 
-                # Scale ticks to meters (Assuming 65536 ticks per revolution)
-                TICKS_PER_REV = 65536.0
-                dist_left = (d_left / TICKS_PER_REV) * self.wheel_perimeter
-                dist_right = (d_right / TICKS_PER_REV) * self.wheel_perimeter
+                # Encoder scaling: delta tick scaling
+                # Note: wheel_perimeter / 65536.0 or encoder resolution
+                # If ticks are raw 32-bit counts:
+                dist_left = (d_left / 65536.0) * self.wheel_perimeter
+                dist_right = (d_right / 65536.0) * self.wheel_perimeter
 
                 dist_center = (dist_left + dist_right) / 2.0
                 delta_theta = (dist_right - dist_left) / self.wheel_gauge
 
-                # Update pose integration (Standard ROS ENU convention)
+                # Pose Integration (Standard ROS ENU)
                 self.x += dist_center * math.cos(self.theta + delta_theta / 2.0)
                 self.y += dist_center * math.sin(self.theta + delta_theta / 2.0)
                 self.theta += delta_theta
@@ -192,7 +185,6 @@ class KeenonT2ChassisDriver(Node):
                 v_x = dist_center / dt
                 v_theta = delta_theta / dt
 
-                # Publish Odometry & TF
                 self.publish_odometry(now, v_x, v_theta)
 
         self.prev_left_ticks = left_ticks
@@ -200,11 +192,9 @@ class KeenonT2ChassisDriver(Node):
         self.last_telemetry_time = now
 
     def publish_odometry(self, now, v_x, v_theta):
-        # Quaternion rotation around Z
         qz = math.sin(self.theta / 2.0)
         qw = math.cos(self.theta / 2.0)
 
-        # Odometry message
         odom = Odometry()
         odom.header.stamp = now.to_msg()
         odom.header.frame_id = self.odom_frame
@@ -223,7 +213,6 @@ class KeenonT2ChassisDriver(Node):
 
         self.odom_pub.publish(odom)
 
-        # TF Broadcaster
         if self.publish_tf:
             t = TransformStamped()
             t.header.stamp = now.to_msg()
@@ -258,15 +247,15 @@ class KeenonT2ChassisDriver(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = KeenonT2ChassisDriver()
+    driver_node = KeenonT2ChassisDriver()
     try:
-        rclpy.spin(node)
+        rclpy.spin(driver_node)
     except KeyboardInterrupt:
         pass
     finally:
-        node.send_motor_command(0.0, 0.0)
-        node.ser.close()
-        node.destroy_node()
+        driver_node.send_motor_command(0.0, 0.0)
+        driver_node.ser.close()
+        driver_node.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':

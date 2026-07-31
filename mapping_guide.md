@@ -221,13 +221,74 @@ Once you have successfully built and saved your map, you can use it to run auton
 
 ---
 
+## 10. Costmap Safety Interlock Fix (Stale Sensor Data)
+
+> [!IMPORTANT]
+> If `move_base` throws the warning `[WARN] [/move_base]: Sensor data is out of date, we're not going to allow commanding of the base for safety`, it is because `observation_sources` in `local_costmap_params.yaml` and `global_costmap_params.yaml` expects continuous streams from `/camera_1/depth/points` or `/bump`.
+>
+> To fix this, update `observation_sources` in both config files on the robot to restrict tracking to `scan`:
+> ```yaml
+> obstacle_layer:
+>   observation_sources: scan
+> ```
+
+---
+
+## 11. Complete Quick Command Cheat Sheet
+
+### Phase 1: Mapping
+```bash
+# 1. Stop proprietary service & clean stale nodes
+ssh peanut@192.168.64.20 "echo 'root' | sudo -S service keenonrobot stop"
+ssh peanut@192.168.64.20 "pkill -u peanut -9 -f ros ; pkill -u peanut -9 -f python"
+ssh peanut@192.168.64.20 "screen -wipe"
+
+# 2. Launch Mapping Stack
+ssh peanut@192.168.64.20 "screen -S mapping -d -m bash -c 'source /opt/ros/indigo/setup.bash && source /home/peanut/open_t2_ws/devel/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && roslaunch open_t2_mapping mapping.launch >/home/peanut/mapping.log 2>&1'"
+
+# 3. Launch Helper Nodes
+ssh peanut@192.168.64.20 "screen -S tf_cleaner -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/tf_cleaner.py >/home/peanut/tf_cleaner.log 2>&1'"
+ssh peanut@192.168.64.20 "screen -S scan_filter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/scan_filter.py >/home/peanut/scan_filter.log 2>&1'"
+
+# 4. Trigger Cartographer SLAM
+ssh peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rostopic pub -1 /run_mapping std_msgs/UInt8 'data: 2'"
+
+# 5. Start RViz on Host
+xhost +local:root
+docker start rviz_opent2
+
+# 6. Teleop & Save Map
+ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun teleop_twist_keyboard teleop_twist_keyboard.py"
+ssh peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun map_server map_saver -f /home/peanut/new_map"
+```
+
+### Phase 2: Navigation & AMCL
+```bash
+# 1. Stop Mapping Stack
+ssh peanut@192.168.64.20 "screen -S mapping -X quit"
+
+# 2. Launch Navigation Stack with new map
+ssh peanut@192.168.64.20 "screen -S navigation -d -m bash -c 'source /opt/ros/indigo/setup.bash && source /home/peanut/open_t2_ws/devel/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && roslaunch open_t2_mapping navigation.launch map_file:=/home/peanut/new_map.yaml >/home/peanut/navigation.log 2>&1'"
+
+# 3. Re-bind Helper Nodes to Navigation Master
+ssh peanut@192.168.64.20 "screen -S tf_cleaner -X quit ; screen -S tf_cleaner -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/tf_cleaner.py >/home/peanut/tf_cleaner.log 2>&1'"
+ssh peanut@192.168.64.20 "screen -S scan_filter -X quit ; screen -S scan_filter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/scan_filter.py >/home/peanut/scan_filter.log 2>&1'"
+
+# 4. Restart RViz on Host
+xhost +local:root
+docker restart rviz_opent2
+```
+
+---
+
 ## Troubleshooting Checklist
 
 | Issue | Cause | Solution |
 |---|---|---|
 | **Unable to register with Master** | Stale master or firewall blocking host. | Check UFW rules: `sudo ufw status`. Verify `ROS_IP` and `ROS_MASTER_URI` on both host and robot. |
-| **LiDAR scans do not update** | `/run_mapping` was not triggered or proprietary service is still holding the USB port. | Run `rostopic pub` trigger command (Step 3). Verify `keenonrobot` service is stopped. |
+| **LiDAR scans do not update** | `/run_mapping` was not triggered or proprietary service is holding USB port. | Run `rostopic pub` trigger command. Verify `keenonrobot` service is stopped. |
 | **No map showing up in RViz** | Noetic RViz is rejecting slash prefixes. | Verify `tf_cleaner.py` screen is active. Inspect output of `rostopic hz /tf_clean`. |
-| **Map saver timeout** | `map_server` cannot connect to `/map` topic. | Ensure `cartographer_occupancy_grid_node` is running and publishing to `/map`. |
-| **WiFi Hotspot disappears / disconnects** | NetworkManager is managing `wlanAP` and deactivating the hostapd bridge. | Follow the Permanent Resolution steps in Section 8 to mark `wlanAP` as unmanaged. |
+| **Robot won't move on 2D Nav Goal** | Costmap observation sources waiting for stale camera/bump data. | Set `observation_sources: scan` in costmap YAMLs (Section 10). |
+| **WiFi Hotspot disappears** | NetworkManager is managing `wlanAP` and deactivating hostapd. | Follow Section 8 to mark `wlanAP` as unmanaged in `/etc/network/interfaces`. |
+
 

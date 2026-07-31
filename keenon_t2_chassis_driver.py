@@ -8,8 +8,7 @@ Publishes:
   - /odom (nav_msgs/msg/Odometry)
   - /tf (odom -> base_link)
   - /imu/data_raw (sensor_msgs/msg/Imu)
-  - /motor_lock_status (std_msgs/msg/Bool) -> True = E-Stop/Lock Active (Disengaged/Free wheel)
-                                            -> False = Normal Drive Mode (Engaged/Ready)
+  - /motor_lock_status (std_msgs/msg/Bool)
 
 Subscribes:
   - /cmd_vel (geometry_msgs/msg/Twist)
@@ -32,8 +31,20 @@ from tf2_ros import TransformBroadcaster
 
 import serial
 
-HEADER = bytes([0xAA, 0xAA])
+HEADER_TX = bytes([0xAA, 0xAA, 0xE0, 0x00]) # PC (0xE0) -> STM32 (0x00)
+HEADER_RX = bytes([0xAA, 0xAA])
 TAIL = bytes([0x55, 0x55])
+
+def crc16_modbus(data: bytes) -> int:
+    crc = 0xFFFF
+    for b in data:
+        crc ^= b
+        for _ in range(8):
+            if crc & 0x0001:
+                crc = (crc >> 1) ^ 0xA001
+            else:
+                crc >>= 1
+    return crc & 0xFFFF
 
 class KeenonT2ChassisDriver(Node):
     def __init__(self):
@@ -83,7 +94,7 @@ class KeenonT2ChassisDriver(Node):
         self.prev_left_ticks = None
         self.prev_right_ticks = None
         self.last_telemetry_time = self.get_clock().now()
-        self.estop_active = False
+        self.motor_locked = True
 
         # Command velocity variables
         self.target_linear_x = 0.0
@@ -93,21 +104,27 @@ class KeenonT2ChassisDriver(Node):
         # Serial read buffer
         self.rx_buffer = bytearray()
 
+        # Send initial motor unlock command
+        self.send_unlock_command(False)
+
         # Timer for main loop (50Hz)
         self.timer = self.create_timer(0.02, self.spin_driver)
+
+    def build_packet(self, cmd_id: int, payload: bytes) -> bytes:
+        seq = 0x00
+        length = len(payload)
+        hdr_bytes = bytes([0xE0, 0x00, cmd_id, seq, length])
+        data_to_crc = hdr_bytes + payload
+        crc_val = crc16_modbus(data_to_crc)
+        crc_bytes = struct.pack('<H', crc_val)
+        return bytes([0xAA, 0xAA]) + data_to_crc + crc_bytes + TAIL
 
     def motor_lock_callback(self, msg: Bool):
         self.send_unlock_command(msg.data)
 
     def send_unlock_command(self, lock: bool):
-        """Sends motor lock/unlock frame to STM32 controller."""
-        val = 0x01 if lock else 0x00
-        cmd_id = 0x21
-        payload = bytes([val])
-        header = bytes([0xAA, 0xAA, 0x00, 0xE0, cmd_id, 0x00, len(payload)])
-        checksum_val = sum(header[2:]) + sum(payload)
-        crc = struct.pack('<H', checksum_val & 0xFFFF)
-        packet = header + payload + crc + TAIL
+        val = 0x01 if not lock else 0x00
+        packet = self.build_packet(0x21, bytes([val]))
         try:
             self.ser.write(packet)
             self.get_logger().info(f"Sent Motor Lock Command (lock={lock}): {packet.hex()}")
@@ -120,20 +137,13 @@ class KeenonT2ChassisDriver(Node):
         self.last_cmd_time = time.time()
 
     def send_motor_command(self, v_m_s: float, w_rad_s: float):
-        """Packs motor velocity command into Keenon STM32 UART frame."""
+        """Packs velocity command into Keenon STM32 UART frame with int16 & CRC16."""
         v_mm_s = int(v_m_s * 1000.0)
         w_mrad_s = int(w_rad_s * 1000.0)
 
-        payload = struct.pack('<ii', v_mm_s, w_mrad_s)
-        cmd_id = 0x20
-        seq = 0x00
-        length = len(payload)
+        payload = struct.pack('<hh', v_mm_s, w_mrad_s)
+        packet = self.build_packet(0x20, payload)
 
-        header = bytes([0xAA, 0xAA, 0x00, 0xE0, cmd_id, seq, length])
-        checksum_val = sum(header[2:]) + sum(payload)
-        crc = struct.pack('<H', checksum_val & 0xFFFF)
-
-        packet = header + payload + crc + TAIL
         try:
             self.ser.write(packet)
         except Exception as e:
@@ -152,7 +162,7 @@ class KeenonT2ChassisDriver(Node):
 
         # 2. Parse telemetry frames
         while True:
-            idx = self.rx_buffer.find(HEADER)
+            idx = self.rx_buffer.find(HEADER_RX)
             if idx == -1:
                 if len(self.rx_buffer) > 1:
                     self.rx_buffer = self.rx_buffer[-1:]
@@ -163,7 +173,7 @@ class KeenonT2ChassisDriver(Node):
 
             end_idx = self.rx_buffer.find(TAIL)
             if end_idx == -1:
-                break # Wait for complete frame
+                break
 
             frame = self.rx_buffer[:end_idx+2]
             self.rx_buffer = self.rx_buffer[end_idx+2:]
@@ -178,14 +188,12 @@ class KeenonT2ChassisDriver(Node):
                 elif cmd_id == 0x32 and payload_len == 16:
                     self.process_imu_frame(payload)
                 elif cmd_id == 0x2E and payload_len == 1:
-                    # 0x00 = E-Stop Active / Motors Disengaged
-                    # 0x01 = Normal Drive Mode / Motors Engaged
-                    self.estop_active = (payload[0] == 0x00)
+                    self.motor_locked = (payload[0] == 0x00)
                     msg = Bool()
-                    msg.data = self.estop_active
+                    msg.data = self.motor_locked
                     self.lock_status_pub.publish(msg)
 
-        # 3. Safety Watchdog & Send motor command
+        # 3. Watchdog & Send command
         if time.time() - self.last_cmd_time > 0.5:
             self.target_linear_x = 0.0
             self.target_angular_z = 0.0
@@ -196,26 +204,38 @@ class KeenonT2ChassisDriver(Node):
         cur_vel_raw, left_ticks, right_ticks = struct.unpack('<iii', payload)
         now = self.get_clock().now()
 
-        if self.prev_left_ticks is not None:
-            dt = (now - self.last_telemetry_time).nanoseconds / 1e9
-            if dt > 0.001:
-                d_left = left_ticks - self.prev_left_ticks
-                d_right = right_ticks - self.prev_right_ticks
+        if self.prev_left_ticks is None:
+            self.prev_left_ticks = left_ticks
+            self.prev_right_ticks = right_ticks
+            self.last_telemetry_time = now
+            return
 
-                dist_left = (d_left / self.ticks_per_rev) * self.wheel_perimeter
-                dist_right = (d_right / self.ticks_per_rev) * self.wheel_perimeter
+        dt = (now - self.last_telemetry_time).nanoseconds / 1e9
+        if dt > 0.001:
+            d_left = left_ticks - self.prev_left_ticks
+            d_right = right_ticks - self.prev_right_ticks
 
-                dist_center = (dist_left + dist_right) / 2.0
-                delta_theta = (dist_right - dist_left) / self.wheel_gauge
+            # Ignore massive glitch jumps (e.g. integer overflow)
+            if abs(d_left) > 10000 or abs(d_right) > 10000:
+                self.prev_left_ticks = left_ticks
+                self.prev_right_ticks = right_ticks
+                self.last_telemetry_time = now
+                return
 
-                self.x += dist_center * math.cos(self.theta + delta_theta / 2.0)
-                self.y += dist_center * math.sin(self.theta + delta_theta / 2.0)
-                self.theta += delta_theta
+            dist_left = (d_left / self.ticks_per_rev) * self.wheel_perimeter
+            dist_right = (d_right / self.ticks_per_rev) * self.wheel_perimeter
 
-                v_x = dist_center / dt
-                v_theta = delta_theta / dt
+            dist_center = (dist_left + dist_right) / 2.0
+            delta_theta = (dist_right - dist_left) / self.wheel_gauge
 
-                self.publish_odometry(now, v_x, v_theta)
+            self.x += dist_center * math.cos(self.theta + delta_theta / 2.0)
+            self.y += dist_center * math.sin(self.theta + delta_theta / 2.0)
+            self.theta += delta_theta
+
+            v_x = dist_center / dt
+            v_theta = delta_theta / dt
+
+            self.publish_odometry(now, v_x, v_theta)
 
         self.prev_left_ticks = left_ticks
         self.prev_right_ticks = right_ticks

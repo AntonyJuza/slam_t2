@@ -39,6 +39,7 @@ class KeenonT2ChassisDriver(Node):
         self.declare_parameter('baudrate', 115200)
         self.declare_parameter('wheel_gauge', 0.366)       # 366 mm track width
         self.declare_parameter('wheel_perimeter', 0.5172)  # 517.2 mm perimeter
+        self.declare_parameter('ticks_per_rev', 4096.0)    # 4096 ticks / rev
         self.declare_parameter('publish_tf', True)
         self.declare_parameter('odom_frame', 'odom')
         self.declare_parameter('base_frame', 'base_link')
@@ -48,6 +49,7 @@ class KeenonT2ChassisDriver(Node):
         self.baudrate = self.get_parameter('baudrate').value
         self.wheel_gauge = self.get_parameter('wheel_gauge').value
         self.wheel_perimeter = self.get_parameter('wheel_perimeter').value
+        self.ticks_per_rev = self.get_parameter('ticks_per_rev').value
         self.publish_tf = self.get_parameter('publish_tf').value
         self.odom_frame = self.get_parameter('odom_frame').value
         self.base_frame = self.get_parameter('base_frame').value
@@ -168,11 +170,9 @@ class KeenonT2ChassisDriver(Node):
                 d_left = left_ticks - self.prev_left_ticks
                 d_right = right_ticks - self.prev_right_ticks
 
-                # Encoder scaling: delta tick scaling
-                # Note: wheel_perimeter / 65536.0 or encoder resolution
-                # If ticks are raw 32-bit counts:
-                dist_left = (d_left / 65536.0) * self.wheel_perimeter
-                dist_right = (d_right / 65536.0) * self.wheel_perimeter
+                # Scale ticks to meters
+                dist_left = (d_left / self.ticks_per_rev) * self.wheel_perimeter
+                dist_right = (d_right / self.ticks_per_rev) * self.wheel_perimeter
 
                 dist_center = (dist_left + dist_right) / 2.0
                 delta_theta = (dist_right - dist_left) / self.wheel_gauge

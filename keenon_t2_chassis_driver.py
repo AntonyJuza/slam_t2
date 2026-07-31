@@ -8,7 +8,8 @@ Publishes:
   - /odom (nav_msgs/msg/Odometry)
   - /tf (odom -> base_link)
   - /imu/data_raw (sensor_msgs/msg/Imu)
-  - /motor_lock_status (std_msgs/msg/Bool)
+  - /motor_lock_status (std_msgs/msg/Bool) -> True = E-Stop/Lock Active (Disengaged/Free wheel)
+                                            -> False = Normal Drive Mode (Engaged/Ready)
 
 Subscribes:
   - /cmd_vel (geometry_msgs/msg/Twist)
@@ -82,7 +83,7 @@ class KeenonT2ChassisDriver(Node):
         self.prev_left_ticks = None
         self.prev_right_ticks = None
         self.last_telemetry_time = self.get_clock().now()
-        self.motor_locked = True
+        self.estop_active = False
 
         # Command velocity variables
         self.target_linear_x = 0.0
@@ -92,9 +93,6 @@ class KeenonT2ChassisDriver(Node):
         # Serial read buffer
         self.rx_buffer = bytearray()
 
-        # Unlock motor command on startup
-        self.send_unlock_command(False) # Unlock motors
-
         # Timer for main loop (50Hz)
         self.timer = self.create_timer(0.02, self.spin_driver)
 
@@ -103,7 +101,6 @@ class KeenonT2ChassisDriver(Node):
 
     def send_unlock_command(self, lock: bool):
         """Sends motor lock/unlock frame to STM32 controller."""
-        # Payload 0x00 = unlock, 0x01 = lock (or vice versa)
         val = 0x01 if lock else 0x00
         cmd_id = 0x21
         payload = bytes([val])
@@ -181,10 +178,11 @@ class KeenonT2ChassisDriver(Node):
                 elif cmd_id == 0x32 and payload_len == 16:
                     self.process_imu_frame(payload)
                 elif cmd_id == 0x2E and payload_len == 1:
-                    # Motor Lock Status Byte
-                    self.motor_locked = (payload[0] == 0x00)
+                    # 0x00 = E-Stop Active / Motors Disengaged
+                    # 0x01 = Normal Drive Mode / Motors Engaged
+                    self.estop_active = (payload[0] == 0x00)
                     msg = Bool()
-                    msg.data = self.motor_locked
+                    msg.data = self.estop_active
                     self.lock_status_pub.publish(msg)
 
         # 3. Safety Watchdog & Send motor command

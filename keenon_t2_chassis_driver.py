@@ -3,13 +3,16 @@
 Keenon T2 ROS 2 Native Chassis Driver
 =====================================
 Direct USB Serial Driver for Keenon T2 Mobile Robot Base (STM32 Controller).
+
 Publishes:
   - /odom (nav_msgs/msg/Odometry)
   - /tf (odom -> base_link)
   - /imu/data_raw (sensor_msgs/msg/Imu)
+  - /motor_lock_status (std_msgs/msg/Bool)
 
 Subscribes:
   - /cmd_vel (geometry_msgs/msg/Twist)
+  - /motor_lock (std_msgs/msg/Bool)
 """
 
 import math
@@ -23,6 +26,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist, TransformStamped
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
+from std_msgs.msg import Bool
 from tf2_ros import TransformBroadcaster
 
 import serial
@@ -63,10 +67,12 @@ class KeenonT2ChassisDriver(Node):
         # Publishers & Broadcasters
         self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
         self.imu_pub = self.create_publisher(Imu, '/imu/data_raw', 10)
+        self.lock_status_pub = self.create_publisher(Bool, '/motor_lock_status', 10)
         self.tf_broadcaster = TransformBroadcaster(self)
 
-        # Subscriber
+        # Subscribers
         self.cmd_sub = self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
+        self.lock_sub = self.create_subscription(Bool, '/motor_lock', self.motor_lock_callback, 10)
 
         # Internal State
         self.x = 0.0
@@ -76,6 +82,7 @@ class KeenonT2ChassisDriver(Node):
         self.prev_left_ticks = None
         self.prev_right_ticks = None
         self.last_telemetry_time = self.get_clock().now()
+        self.motor_locked = True
 
         # Command velocity variables
         self.target_linear_x = 0.0
@@ -85,8 +92,30 @@ class KeenonT2ChassisDriver(Node):
         # Serial read buffer
         self.rx_buffer = bytearray()
 
+        # Unlock motor command on startup
+        self.send_unlock_command(False) # Unlock motors
+
         # Timer for main loop (50Hz)
         self.timer = self.create_timer(0.02, self.spin_driver)
+
+    def motor_lock_callback(self, msg: Bool):
+        self.send_unlock_command(msg.data)
+
+    def send_unlock_command(self, lock: bool):
+        """Sends motor lock/unlock frame to STM32 controller."""
+        # Payload 0x00 = unlock, 0x01 = lock (or vice versa)
+        val = 0x01 if lock else 0x00
+        cmd_id = 0x21
+        payload = bytes([val])
+        header = bytes([0xAA, 0xAA, 0x00, 0xE0, cmd_id, 0x00, len(payload)])
+        checksum_val = sum(header[2:]) + sum(payload)
+        crc = struct.pack('<H', checksum_val & 0xFFFF)
+        packet = header + payload + crc + TAIL
+        try:
+            self.ser.write(packet)
+            self.get_logger().info(f"Sent Motor Lock Command (lock={lock}): {packet.hex()}")
+        except Exception as e:
+            self.get_logger().error(f"Failed to send lock command: {e}")
 
     def cmd_vel_callback(self, msg: Twist):
         self.target_linear_x = msg.linear.x
@@ -104,7 +133,6 @@ class KeenonT2ChassisDriver(Node):
         length = len(payload)
 
         header = bytes([0xAA, 0xAA, 0x00, 0xE0, cmd_id, seq, length])
-        
         checksum_val = sum(header[2:]) + sum(payload)
         crc = struct.pack('<H', checksum_val & 0xFFFF)
 
@@ -152,6 +180,12 @@ class KeenonT2ChassisDriver(Node):
                     self.process_encoder_frame(payload)
                 elif cmd_id == 0x32 and payload_len == 16:
                     self.process_imu_frame(payload)
+                elif cmd_id == 0x2E and payload_len == 1:
+                    # Motor Lock Status Byte
+                    self.motor_locked = (payload[0] == 0x00)
+                    msg = Bool()
+                    msg.data = self.motor_locked
+                    self.lock_status_pub.publish(msg)
 
         # 3. Safety Watchdog & Send motor command
         if time.time() - self.last_cmd_time > 0.5:
@@ -170,14 +204,12 @@ class KeenonT2ChassisDriver(Node):
                 d_left = left_ticks - self.prev_left_ticks
                 d_right = right_ticks - self.prev_right_ticks
 
-                # Scale ticks to meters
                 dist_left = (d_left / self.ticks_per_rev) * self.wheel_perimeter
                 dist_right = (d_right / self.ticks_per_rev) * self.wheel_perimeter
 
                 dist_center = (dist_left + dist_right) / 2.0
                 delta_theta = (dist_right - dist_left) / self.wheel_gauge
 
-                # Pose Integration (Standard ROS ENU)
                 self.x += dist_center * math.cos(self.theta + delta_theta / 2.0)
                 self.y += dist_center * math.sin(self.theta + delta_theta / 2.0)
                 self.theta += delta_theta

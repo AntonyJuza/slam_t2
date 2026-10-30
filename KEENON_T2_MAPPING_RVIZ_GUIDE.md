@@ -46,11 +46,13 @@ docker run -it --rm \
   --net=host \
   -e DISPLAY=$DISPLAY \
   -e QT_X11_NO_MITSHM=1 \
+  -e LIBGL_ALWAYS_SOFTWARE=1 \
   -e ROS_MASTER_URI=http://192.168.64.20:11311 \
+  -e ROS_IP=192.168.64.208 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /home/juza/slam_t2:/workspace \
   osrf/ros:noetic-desktop-full \
-  rviz
+  rviz -d /workspace/OpenT2/mapping/rviz/mapping.rviz
 ```
 *In RViz: Set **Fixed Frame** to `map`, add **Map** set to `/map`, and add **LaserScan** set to `/scan`.*
 
@@ -68,7 +70,9 @@ docker run -it --rm \
   --net=host \
   -e DISPLAY=$DISPLAY \
   -e QT_X11_NO_MITSHM=1 \
+  -e LIBGL_ALWAYS_SOFTWARE=1 \
   -e ROS_MASTER_URI=http://192.168.64.20:11311 \
+  -e ROS_IP=192.168.64.208 \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /home/juza/slam_t2:/workspace \
   osrf/ros:noetic-desktop-full \

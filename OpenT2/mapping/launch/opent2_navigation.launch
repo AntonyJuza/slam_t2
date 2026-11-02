@@ -8,10 +8,11 @@
   <arg name="use_camera" default="false" doc="Enable dual Orbbec Astra depth cameras"/>
   <arg name="use_rviz" default="false" doc="Launch RViz visualization interface"/>
 
-  <!-- 1. Keenon Chassis Driver & Robot State Publisher (URDF / Static TFs) -->
-  <include file="$(find robot_settings)/launch/include/chassis.launch">
-    <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
-  </include>
+  <!-- 1. Keenon Chassis Driver (remapped to /cmd_vel_chassis so cmd_vel_inverter controls it) -->
+  <node pkg="chassis" type="chassis" name="chassis" respawn="true" output="screen">
+    <rosparam file="$(find robot_settings)/cfg/yaml/$(arg robot_type)/chassis_params.yaml" command="load"/>
+    <remap from="/cmd_vel" to="/cmd_vel_chassis"/>
+  </node>
   <include file="$(find robot_settings)/launch/include/robot_state_publisher.launch">
     <arg name="ROBOT_TYPE" value="$(arg robot_type)"/>
   </include>
@@ -48,10 +49,11 @@
   <!-- 4a. Encoder Inverter (Inverts linear travel while preserving yaw rotation) -->
   <node name="encoder_inverter" pkg="open_t2_mapping" type="encoder_inverter.py" output="screen" respawn="true" />
 
-  <!-- 4b. Command Velocity Inverter (Inverts linear.x for Keenon chassis controller) -->
+  <!-- 4b. Command Velocity Inverter (Inverts linear.x: /cmd_vel (+x forward) -> /cmd_vel_chassis (-x forward for Keenon motor)) -->
   <node name="cmd_vel_inverter" pkg="open_t2_mapping" type="cmd_vel_inverter.py" output="screen" respawn="true">
     <param name="invert_linear" value="true" />
     <param name="invert_angular" value="false" />
+    <param name="output_topic" value="/cmd_vel_chassis" />
   </node>
 
   <!-- 4c. Front End Node (Wheel Odometry + Scan Matching -> odom to base_link TF) -->

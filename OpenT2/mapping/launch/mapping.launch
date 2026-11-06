@@ -54,9 +54,17 @@
         output="screen">
   </node>
 
+  <!-- 6. Start Rosbridge Server for Android Tablet WebSocket connection -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+    <arg name="port" value="9090"/>
+  </include>
+
+  <!-- 7. Start Web Backend Node to stream /map to /map/to_web/compressed -->
+  <include file="$(find robot_settings)/launch/include/web_backend.launch"/>
+
   <arg name="use_rviz" default="false" />
 
-  <!-- 6. Start RViz for visualization -->
+  <!-- 8. Start RViz for visualization -->
   <node name="rviz" pkg="rviz" type="rviz" required="true"
         args="-d $(find open_t2_mapping)/rviz/mapping.rviz" if="$(arg use_rviz)" />
 </launch>

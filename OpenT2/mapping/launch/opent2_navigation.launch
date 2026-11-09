@@ -99,7 +99,12 @@
     <rosparam file="$(find open_t2_mapping)/config/navigation/teb_local_planner_params.yaml" command="load" />
   </node>
 
-  <!-- 8. Optional RViz Visualization -->
+  <!-- 8. Rosbridge WebSocket Server for Android Tablet (Port 9090) -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
+    <arg name="port" value="9090"/>
+  </include>
+
+  <!-- 9. Optional RViz Visualization -->
   <node name="rviz" pkg="rviz" type="rviz" if="$(arg use_rviz)"
         args="-d $(find open_t2_mapping)/rviz/mapping.rviz" />
 </launch>

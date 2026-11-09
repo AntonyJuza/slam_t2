@@ -104,6 +104,7 @@ class OpenT2MapManagerNode(object):
         rospy.Service("/opent2/map/activate_revision", Trigger, self.handle_activate_revision)
         rospy.Service("/opent2/map/publish_revision", Trigger, self.handle_publish_revision)
         self.sub_activate = rospy.Subscriber("/opent2/map/command_activate", String, self.handle_command_activate)
+        self.sub_save_features = rospy.Subscriber("/opent2/map/save_features", String, self.handle_save_features)
 
         # Ensure baseline map is registered and active
         self._ensure_baseline_map()
@@ -245,10 +246,85 @@ class OpenT2MapManagerNode(object):
             map_id = data.get("map_id", self.default_map_id)
             rev_num = int(data.get("revision", 1))
             rospy.loginfo("Received command to activate map: %s (rev %d)", map_id, rev_num)
+            rospy.set_param("~target_revision", rev_num)
+            rospy.set_param("~target_map_id", map_id)
             self.db.set_active_map(map_id, rev_num, activated_by="command_topic")
             self.publish_active_map()
         except Exception as e:
             rospy.logerr("Failed to activate map from topic: %s", str(e))
+
+    def handle_save_features(self, msg):
+        try:
+            data = json.loads(msg.data)
+            map_id = data.get("map_id", self.default_map_id)
+            notes = data.get("notes", "Published from T2 Tera App")
+            published_by = data.get("published_by", "t2_tera_app")
+            features = data.get("features", [])
+
+            rospy.loginfo("Received %d features to save for map: %s", len(features), map_id)
+
+            m = self.db.get_map(map_id)
+            if not m:
+                rospy.logerr("Map not found: %s", map_id)
+                return
+
+            # Insert or replace features
+            for f in features:
+                kind = f.get("kind", "waypoint")
+                name = f.get("name", "Feature")
+                geom = f.get("geometry", [])
+                props = f.get("properties", {})
+                feat_id = f.get("feature_id")
+                if feat_id:
+                    self.db.delete_feature(feat_id, soft_delete=False)
+                self.db.add_feature(
+                    map_id=map_id,
+                    kind=kind,
+                    name=name,
+                    geometry=geom,
+                    properties=props,
+                    feature_id=feat_id
+                )
+
+            # Compile next revision
+            all_features = self.db.get_features(map_id, include_deleted=False)
+            latest_rev = self.db.get_latest_revision_number(map_id)
+            next_rev = latest_rev + 1
+
+            map_dir = os.path.join(self.maps_root, "maps", map_id)
+            base_pgm = os.path.join(map_dir, m["base_pgm_relpath"])
+            base_yaml = os.path.join(map_dir, m["base_yaml_relpath"])
+            rev_dir = os.path.join(map_dir, "revisions", "rev_%d" % next_rev)
+
+            manifest = self.compiler.compile(
+                base_pgm_path=base_pgm,
+                base_yaml_path=base_yaml,
+                features=all_features,
+                output_dir=rev_dir
+            )
+
+            bundle_rel = "revisions/rev_%d" % next_rev
+            self.db.create_revision(
+                map_id=map_id,
+                revision_number=next_rev,
+                bundle_relpath=bundle_rel,
+                bundle_sha256=manifest["bundle_sha256"],
+                features_snapshot=all_features,
+                map_yaml_rel=bundle_rel + "/map.yaml",
+                map_pgm_rel=bundle_rel + "/map.pgm",
+                map_amcl_yaml_rel=bundle_rel + "/map_amcl.yaml",
+                map_amcl_pgm_rel=bundle_rel + "/map_amcl.pgm",
+                thumbnail_rel=bundle_rel + "/thumbnail.png",
+                published_by=published_by,
+                notes=notes
+            )
+
+            # Auto-activate newly published revision
+            self.db.set_active_map(map_id, next_rev, activated_by="publish_save_features")
+            self.publish_active_map()
+            rospy.loginfo("Successfully compiled and activated revision %d for map %s", next_rev, map_id)
+        except Exception as e:
+            rospy.logerr("Failed to save features: %s", str(e))
 
     # --- SERVICE HANDLERS ---
 
@@ -269,11 +345,15 @@ class OpenT2MapManagerNode(object):
     def handle_activate_revision(self, req):
         """
         Request format in req (or parameter):
-        Expects map_id and revision in ROS params or default to latest.
+        Expects map_id and revision in ROS params or retains current active.
         """
         try:
             map_id = rospy.get_param("~target_map_id", self.default_map_id)
-            rev_num = int(rospy.get_param("~target_revision", 1))
+            if rospy.has_param("~target_revision"):
+                rev_num = int(rospy.get_param("~target_revision"))
+            else:
+                active = self.db.get_active_map()
+                rev_num = active["active_revision"] if active else 1
             self.db.set_active_map(map_id, rev_num, activated_by="service_call")
             success = self.publish_active_map()
             return TriggerResponse(success=success, message="Map activated: %s rev %d" % (map_id, rev_num))

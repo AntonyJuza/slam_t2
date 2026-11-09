@@ -104,6 +104,13 @@
     <arg name="port" value="9090"/>
   </include>
 
+  <!-- 8b. Web Backend Node (Compresses /map to /map/to_web/compressed for mobile UI) -->
+  <node pkg="web_backend" type="web_backend_node" name="web_backend_node" respawn="true" output="screen" args="_image_transport:=compressed">
+    <param name="web_map_save_path" value="/etc/ros/runtime/web_receive/map.pgm"/>
+    <param name="web_virtual_wall_map_save_path" value="/etc/ros/runtime/web_receive/virtual_wall.pgm"/>
+    <param name="maps_layer_path" value="/etc/ros/runtime/web/maps/layer.json"/>
+  </node>
+
   <!-- 9. Optional RViz Visualization -->
   <node name="rviz" pkg="rviz" type="rviz" if="$(arg use_rviz)"
         args="-d $(find open_t2_mapping)/rviz/mapping.rviz" />

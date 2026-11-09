@@ -176,14 +176,50 @@ class OpenT2Compiler(object):
             geom = f.get("geometry")
             if not geom or not isinstance(geom, list):
                 continue
+            props = f.get("properties") or {}
+            radius_m = float(props.get("radius_meters", 0.4))
+            radius_px = max(1, int(round(radius_m / res)))
+            thickness_px = max(1, radius_px * 2)
+            clear_unknown = bool(props.get("clear_unknown", False))
+
             pts = []
             for pt in geom:
                 c, r = world_to_pixel(pt[0], pt[1], orig_x, orig_y, res, h)
-                pts.append([c, r])
-            if len(pts) >= 3:
-                cv2_pts = np.array([pts], dtype=np.int32)
-                cv2.fillPoly(arr_amcl, cv2_pts, FREE_VAL)
-                cv2.fillPoly(arr_nav, cv2_pts, FREE_VAL)
+                pts.append((c, r))
+
+            if not pts:
+                continue
+
+            mask = np.zeros((h, w), dtype=np.uint8)
+
+            if len(pts) == 1:
+                # Single circular point
+                cv2.circle(mask, pts[0], radius_px, 255, -1)
+            elif len(pts) == 2:
+                # Line segment stroke
+                cv2.line(mask, pts[0], pts[1], 255, thickness_px)
+                cv2.circle(mask, pts[0], radius_px, 255, -1)
+                cv2.circle(mask, pts[1], radius_px, 255, -1)
+            elif len(pts) >= 3:
+                if props.get("is_polygon", False) or "radius_meters" not in props:
+                    # Explicit polygon
+                    cv2_pts = np.array([pts], dtype=np.int32)
+                    cv2.fillPoly(mask, cv2_pts, 255)
+                else:
+                    # Multi-point continuous stroke
+                    for i in range(len(pts) - 1):
+                        cv2.line(mask, pts[i], pts[i + 1], 255, thickness_px)
+                        cv2.circle(mask, pts[i], radius_px, 255, -1)
+                    cv2.circle(mask, pts[-1], radius_px, 255, -1)
+
+            # Avoid converting unknown space (205) to free space unless explicitly requested
+            if not clear_unknown:
+                target = (mask > 0) & (base_arr != UNKNOWN_VAL)
+            else:
+                target = (mask > 0)
+
+            arr_amcl[target] = FREE_VAL
+            arr_nav[target] = FREE_VAL
 
         # 3. Rasterize Keepouts (applied to Navigation ONLY)
         for f in keepouts:

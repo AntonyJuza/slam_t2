@@ -4,6 +4,7 @@
   <!-- ========================================================================= -->
   <arg name="robot_type" default="T2" doc="Robot hardware platform type (T2)"/>
   <arg name="map_file" default="/home/peanut/maps/my_new_map_cropped.yaml" doc="Path to occupancy grid map YAML"/>
+  <arg name="use_map_manager" default="true" doc="Use OpenT2 layered SQLite Map Manager instead of static map_server"/>
   <arg name="use_amcl" default="true" doc="Enable AMCL particle filter localization"/>
   <arg name="use_camera" default="false" doc="Enable dual Orbbec Astra depth cameras"/>
   <arg name="use_rviz" default="false" doc="Launch RViz visualization interface"/>
@@ -66,13 +67,20 @@
     <rosparam file="$(find robot_location)/launch/common_SRF.yaml" command="load"/>
   </node>
 
-  <!-- 5. Map Server (Loads optimized occupancy grid) -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen" />
+  <!-- 5a. OpenT2 Map Manager (Dynamic Layered SQLite Map Engine) -->
+  <node name="opent2_map_manager" pkg="open_t2_mapping" type="opent2_map_manager.py" output="screen" respawn="true" if="$(arg use_map_manager)">
+    <param name="maps_root" value="/home/peanut/opent2_maps" />
+    <param name="default_map_id" value="default_floor" />
+  </node>
+
+  <!-- 5b. Legacy Static Map Server Fallback -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" output="screen" unless="$(arg use_map_manager)" />
 
   <!-- 6. AMCL Localization (Subscribes to /scan_filtered, broadcasts map to odom TF) -->
   <node pkg="amcl" type="amcl" name="amcl" respawn="true" output="screen" if="$(arg use_amcl)">
     <rosparam file="$(find open_t2_mapping)/config/navigation/amcl_params.yaml" command="load"/>
     <remap from="scan" to="scan_filtered" />
+    <remap from="map" to="map_amcl" if="$(arg use_map_manager)" />
   </node>
 
   <!-- 7. Move Base Navigation Stack (GlobalPlanner + TEB Local Planner) -->

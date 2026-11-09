@@ -63,6 +63,14 @@ Filters out laser scan reflections/spikes close to the robot's base or wheels to
 ssh peanut@192.168.64.20 "screen -S scan_filter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/scan_filter.py >/home/peanut/scan_filter.log 2>&1'"
 ```
 
+### D. The Command Velocity Inverter Node (Forward/Backward Inversion)
+The Keenon chassis STM32 firmware expects negative `linear.x` for forward drive and positive `linear.x` for backward drive. Standard teleoperation tools (`teleop_twist_keyboard`) output positive `linear.x` for forward movement ('i' key), which would cause the physical robot to drive backward. 
+
+This node intercepts teleop and navigation velocity commands, inverts linear forward/backward drive (`invert_linear=true`), preserves natural left/right rotation (`invert_angular=false`), and publishes the conditioned command directly to `/cmd_vel`:
+```bash
+ssh peanut@192.168.64.20 "screen -S cmd_vel_inverter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/cmd_vel_inverter.py _invert_linear:=true _invert_angular:=false >/home/peanut/cmd_vel_inverter.log 2>&1'"
+```
+
 
 ---
 
@@ -118,10 +126,28 @@ docker restart rviz_opent2
 ## 6. Step 5: Teleoperating & Building the Map
 
 1. **Start the Teleop keyboard node:**
-   Open a new terminal on the host machine and SSH into the robot to run teleoperation:
+   Open a new terminal on the host machine and SSH into the robot to run teleoperation.
+
+   **Method A: Dedicated Pre-calibrated Teleop (Recommended - No inverter or remapping required)**
    ```bash
-   ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun teleop_twist_keyboard teleop_twist_keyboard.py"
+   ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python /home/peanut/teleop.py"
    ```
+
+   **Method B: Standard ROS Teleop via `cmd_vel_inverter`**
+   *(Requires `cmd_vel_inverter` running in screen and explicitly passing `cmd_vel:=cmd_vel_teleop`)*:
+   ```bash
+   ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=cmd_vel_teleop"
+   ```
+   > [!IMPORTANT]
+   > Do **NOT** run plain `rosrun teleop_twist_keyboard teleop_twist_keyboard.py` without `cmd_vel:=cmd_vel_teleop`. Standard ROS teleop outputs positive `linear.x` for forward drive, which the Keenon chassis microcontroller interprets in reverse (driving backward on 'i').
+
+   *Controls:*
+   - `i`: Drive Forward (Microcontroller receives negative `linear.x`)
+   - `,`: Drive Backward (Microcontroller receives positive `linear.x`)
+   - `j` / `l`: Turn Left / Turn Right (`angular.z` preserved)
+   - `u` / `o`: Forward Left / Forward Right
+   - `m` / `.`: Backward Left / Backward Right
+   - `k`: Stop
 
 2. **Mapping Guidelines:**
    * Drive the robot slowly (ideal speed is < 0.2 m/s).
@@ -202,11 +228,12 @@ Once you have successfully built and saved your map, you can use it to run auton
    ```
 
 
-2. **Restart the Helper Nodes (TF Cleaner & Scan Filter):**
-   Because launching the navigation launcher starts a new ROS Master, you must restart the `tf_cleaner` and `scan_filter` nodes so they register with the new master:
+2. **Restart the Helper Nodes (TF Cleaner, Scan Filter, & Velocity Inverter):**
+   Because launching the navigation launcher starts a new ROS Master, you must restart the `tf_cleaner`, `scan_filter`, and `cmd_vel_inverter` nodes so they register with the new master:
    ```bash
    ssh peanut@192.168.64.20 "screen -S tf_cleaner -X quit ; screen -S tf_cleaner -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/tf_cleaner.py >/home/peanut/tf_cleaner.log 2>&1'"
    ssh peanut@192.168.64.20 "screen -S scan_filter -X quit ; screen -S scan_filter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/scan_filter.py >/home/peanut/scan_filter.log 2>&1'"
+   ssh peanut@192.168.64.20 "screen -S cmd_vel_inverter -X quit ; screen -S cmd_vel_inverter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/cmd_vel_inverter.py _invert_linear:=true _invert_angular:=false >/home/peanut/cmd_vel_inverter.log 2>&1'"
    ```
 
 
@@ -249,6 +276,7 @@ ssh peanut@192.168.64.20 "screen -S mapping -d -m bash -c 'source /opt/ros/indig
 # 3. Launch Helper Nodes
 ssh peanut@192.168.64.20 "screen -S tf_cleaner -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/tf_cleaner.py >/home/peanut/tf_cleaner.log 2>&1'"
 ssh peanut@192.168.64.20 "screen -S scan_filter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/scan_filter.py >/home/peanut/scan_filter.log 2>&1'"
+ssh peanut@192.168.64.20 "screen -S cmd_vel_inverter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/cmd_vel_inverter.py _invert_linear:=true _invert_angular:=false >/home/peanut/cmd_vel_inverter.log 2>&1'"
 
 # 4. Trigger Cartographer SLAM
 ssh peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rostopic pub -1 /run_mapping std_msgs/UInt8 'data: 2'"
@@ -258,7 +286,10 @@ xhost +local:root
 docker start rviz_opent2
 
 # 6. Teleop & Save Map
-ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun teleop_twist_keyboard teleop_twist_keyboard.py"
+# Method A (Recommended, pre-inverted):
+ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python /home/peanut/teleop.py"
+# (Or Method B via cmd_vel_inverter):
+# ssh -t peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun teleop_twist_keyboard teleop_twist_keyboard.py cmd_vel:=cmd_vel_teleop"
 ssh peanut@192.168.64.20 "source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && rosrun map_server map_saver -f /home/peanut/new_map"
 ```
 
@@ -273,6 +304,7 @@ ssh peanut@192.168.64.20 "screen -S navigation -d -m bash -c 'source /opt/ros/in
 # 3. Re-bind Helper Nodes to Navigation Master
 ssh peanut@192.168.64.20 "screen -S tf_cleaner -X quit ; screen -S tf_cleaner -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/tf_cleaner.py >/home/peanut/tf_cleaner.log 2>&1'"
 ssh peanut@192.168.64.20 "screen -S scan_filter -X quit ; screen -S scan_filter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/scan_filter.py >/home/peanut/scan_filter.log 2>&1'"
+ssh peanut@192.168.64.20 "screen -S cmd_vel_inverter -X quit ; screen -S cmd_vel_inverter -d -m bash -c 'source /opt/ros/indigo/setup.bash && export ROS_IP=192.168.64.20 && export ROS_MASTER_URI=http://192.168.64.20:11311 && python -u /home/peanut/cmd_vel_inverter.py _invert_linear:=true _invert_angular:=false >/home/peanut/cmd_vel_inverter.log 2>&1'"
 
 # 4. Restart RViz on Host
 xhost +local:root
@@ -288,6 +320,7 @@ docker restart rviz_opent2
 | **Unable to register with Master** | Stale master or firewall blocking host. | Check UFW rules: `sudo ufw status`. Verify `ROS_IP` and `ROS_MASTER_URI` on both host and robot. |
 | **LiDAR scans do not update** | `/run_mapping` was not triggered or proprietary service is holding USB port. | Run `rostopic pub` trigger command. Verify `keenonrobot` service is stopped. |
 | **No map showing up in RViz** | Noetic RViz is rejecting slash prefixes. | Verify `tf_cleaner.py` screen is active. Inspect output of `rostopic hz /tf_clean`. |
+| **Robot drives backward when pressing 'i' (forward)** | Raw teleop bypassing velocity inverter. | Ensure `cmd_vel_inverter` screen is running and launch teleop with `cmd_vel:=cmd_vel_teleop`. |
 | **Robot won't move on 2D Nav Goal** | Costmap observation sources waiting for stale camera/bump data. | Set `observation_sources: scan` in costmap YAMLs (Section 10). |
 | **WiFi Hotspot disappears** | NetworkManager is managing `wlanAP` and deactivating hostapd. | Follow Section 8 to mark `wlanAP` as unmanaged in `/etc/network/interfaces`. |
 
